@@ -9,10 +9,10 @@ ISA | RISC-V (RV32I)
 乗除算命令（M） |まだ
 単精度浮動小数点演算（F） |まだ
 アトミック命令（A） |まだ
-パイプライン化 |✔
-スーパースカラ化 |まだ
-キャッシュ |まだ
-特権関係 |まだ
+パイプライン化 *pipeline* |✔
+スーパースカラ化 *superscalar* |まだ
+キャッシュ *cache* |まだ
+特権関係  *Privileged Architecture* |まだ
 OS |まだ
 
 ## Running poyo-v on an FPGA
