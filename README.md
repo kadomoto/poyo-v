@@ -19,27 +19,38 @@ OS |まだ
 ### 動作環境
 - OS: Windows10 or Ubuntu18.04
 - Vivado: 2018.3
-- FPGAボード: ZYBO Z7-10
+- FPGAボード: [ZYBO Z7-10](http://akizukidenshi.com/catalog/g/gM-12552/)
+- USB-シリアル変換モジュール: [FT232RL](http://akizukidenshi.com/catalog/g/gK-01977/)等
 
-### チュートリアル
 poyo-vをFPGA上で動かすためには、以下のような手順が必要です。
 
-#### 1. 本リポジトリをクローン
+### 1. 本リポジトリをクローン
 このリポジトリをローカルに持ってきます。
 ```
 $ git clone https://github.com/ourfool/poyo-v.git
 ```
 
-#### 2. .tclの書き換え
+### 2. .tclの書き換え
 `poyo-v/tcl/poyo-v_pipeline_3stage.tcl`のはじめに書かれた`set origin_dir "D:/Github/poyo-v/tcl"`を修正します。ローカル環境に合わせて`poyo-v/tcl`の場所を絶対パスで記述し直してください。注意点としてはWindows環境の場合にも`/`区切りのパスで記述してください。
 
-#### 3. プロジェクト作成
+### 3. プロジェクト作成
 Vivadoを開き、上部タブの**Tools**→**Run Tcl Script**から`poyo-v/tcl/poyo-v_pipeline_3stage.tcl`ファイルを開くことで新規プロジェクトを作成します。
 
-#### 4. メモリデータパスの書き換え
-RISC-Vプロセッサのメモリに読み込む.hexファイルのパスを環境に合わせて修正します。修正するファイルは、`poyo-v/tcl/poyo-v_pipeline_3stage.tcl`
+### 4. メモリデータパスの書き換え
+RISC-Vプロセッサのメモリに読み込む.hexファイルのパスを環境に合わせて修正します。修正する箇所は、`poyo-v/src/pipeline_3stage/design/define.vh`内の`define MEM_DATA_PATH "D:/Github/poyo-v/software/Coremark_for_50MHz/"`です。ローカル環境に合わせて
+`poyo-v/software/Coremark_for_50MHz/"`の場所を絶対パスで記述し直してください。
 
-## Example
+### 5. Bitstream生成・書き込み
+各ファイルの修正完了後に、作成したVivadoプロジェクト上で、左端の**Flow Navigator**から**PROGRAM AND DEBUG**→**Generate Bitstream**を選択してBitstreamを生成します。完了したらPCとFPGAボードとを接続し、**Open Hardware Manager**から**Program device**を選択してFPGAボードへと書き込みます。
+
+### 6. 動作確認
+サンプルプログラムは組み込み向けベンチマークの[Coremark](https://www.eembc.org/coremark/)です。`poyo-v/src/pipeline_3stage/constraint/const.xdc`内で指定されたUART用端子（Pmod Header JEのje[0]、最右上側の端子）とGND端子（Pmod Header JEの左から2番目、上側の端子）とをUSB-シリアル変換モジュールのRX端子とGND端子へそれぞれ接続し、PCへUSBケーブルを介してつなぐことで、UART出力をPC上のシリアルターミナルソフト（Teraterm、gtkterm、Arduino IDE付属のターミナル等）で確認することができます。シリアルターミナルソフトのbaudrateは115200に設定してください。
+
+<img src="https://github.com/ourfool/image-files/blob/master/poyo-v.jpg" width="600px">
+
+接続とターミナルソフトの設定を完了したら、動作確認をおこなえます。`poyo-v/src/pipeline_3stage/constraint/const.xdc`内で指定されたリセットボタン（btn[0]）を押すとプログラムが開始し、10秒ほどでシリアルターミナル上に完了のメッセージが表示されます。
+
+<img src="https://github.com/ourfool/image-files/blob/master/poyo-v.png" width="600px">
  
 ## Author
 * **Ourfool in Saginomiya** -[homepage](http://www.saginomiya.xyz/)-
