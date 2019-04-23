@@ -16,10 +16,29 @@ ISA | RISC-V (RV32I)
 OS |まだ
 
 ## Running poyo-v on an FPGA
+### 動作環境
+OS: Windows10 or Ubuntu18.04
+
+Vivado: 2018.3
+
+FPGAボード: ZYBO Z7-10
+
+### チュートリアル
 poyo-vをFPGA上で動かすためには、以下のような手順が必要です。
 
-## Example
+#### 本リポジトリをクローン
+このリポジトリをローカルに持ってきます。
 
+#### .tclの書き換え
+.tclに書かれたパスを環境に合わせて修正します。
+
+#### プロジェクト作成
+Vivadoを開き、.tclファイルを開くことで新規プロジェクトを作成します。
+
+#### メモリデータパスの書き換え
+メモリに読み込む.hexファイルのパスを環境に合わせて修正します。
+
+## Example
  
 ## Author
 * **Ourfool in Saginomiya** -[homepage](http://www.saginomiya.xyz/)-
