@@ -16,6 +16,7 @@
 #########
 #Do NOT ignore VHDL, Verilog, block diagrams or EDIF files.
 !*.vhd
+!*.vh
 !*.v
 !*.bd
 !*.edif
