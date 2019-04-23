@@ -48,7 +48,7 @@ RISC-Vプロセッサのメモリに読み込む.hexファイルのパスを環�
 
 <img src="https://github.com/ourfool/image-files/blob/master/poyo-v.jpg" width="600px">
 
-接続とターミナルソフトの設定を完了したら、動作確認をおこなえます。`poyo-v/src/pipeline_3stage/constraint/const.xdc`内で指定されたリセットボタン（btn[0]）を押すとプログラムが開始し、10秒ほどでシリアルターミナル上に完了のメッセージが表示されます。
+各接続とターミナルソフトの設定を完了したら、動作確認をおこなうことができます。`poyo-v/src/pipeline_3stage/constraint/const.xdc`内で指定されたリセットボタン（btn[0]）を押すとプログラムが開始し、10秒ほどでシリアルターミナル上に完了のメッセージが表示されます。
 
 <img src="https://github.com/ourfool/image-files/blob/master/poyo-v.png" width="600px">
  
