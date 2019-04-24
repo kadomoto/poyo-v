@@ -29,3 +29,8 @@
 #TCL - files
 #########
 !*.tcl
+#########
+#Software files
+#########
+!*.md
+!*.hex
