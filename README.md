@@ -51,6 +51,34 @@ RISC-Vプロセッサのメモリに読み込む.hexファイルのパスを環�
 各接続とターミナルソフトの設定を完了したら、動作確認をおこなうことができます。`poyo-v/src/pipeline_3stage/constraint/const.xdc`内で指定されたリセットボタン（btn[0]）を押すとプログラムが開始し、10秒ほどでシリアルターミナル上に完了のメッセージが表示されます。
 
 <img src="https://github.com/ourfool/image-files/blob/master/poyo-v.png" width="600px">
+
+## Creating an executable program file
+poyo-v上で動作するプログラムを作るためには、以下のような手順が必要です。
+
+### 1. コンパイラツールチェーンの用意
+RISC-V RV32I向けの実行ファイルを生成するソフトウェアツールチェーンを用意します。gccの場合は[公式リポジトリ](https://github.com/riscv/riscv-gcc)を参照してください。
+
+### 2. メモリマップの設定
+リンカスクリプト等を編集して、poyo-v向けのメモリマップ設定をおこないます。poyo-vにおいては以下のようなメモリマップを想定しています。
+
+| アドレス | 容量 | 内容 |
+| --- | ---　| --- |
+| 0x00000-0x07FFF | 32KiB | なし |
+| 0x08000-0x0FFFF | 32KiB | .text(ROM) |
+| 0x10000-0x17FFF | 32KiB | .rodata + .data + .bss + .comment(RAM) |
+| 0x18000-0x1FFFF | 32KiB | stack(RAM) |
+
+### 3. スタートアップルーチンの用意
+スタートアップルーチンを作成します。
+
+### 4. コード記述
+動かしたいプログラムを記述します。
+
+### 5. コンパイル
+実行ファイルを生成します。可能であればIntel HEX等の形式に変換します。
+ 
+### 6. .hex形式への変換
+poyo-vで読み込むための.hex形式へと変換をおこないます。
  
 ## Author
 * **Ourfool in Saginomiya** -[homepage](http://www.saginomiya.xyz/)-
