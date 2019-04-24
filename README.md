@@ -3,9 +3,9 @@ poyo-vはFPGAやASICに使えるRISC-Vソフトプロセッサです。誰でも
 
 *Poyo-v is a RISC-V soft processor developed for FPGAs and ASICs. It is being developed in Verilog HDL aiming at a general-purpose in-order superscalar processor which anyone can easily extend / implement.*
 
-機能 | 実装済 or まだ
---- | ---
-ISA | RISC-V (RV32I)
+機能 |実装済 or まだ
+--- |---
+ISA |RISC-V (RV32I)
 乗除算命令（M） |まだ
 単精度浮動小数点演算（F） |まだ
 アトミック命令（A） |まだ
@@ -61,12 +61,13 @@ RISC-V RV32I向けの実行ファイルを生成するソフトウェアツー�
 ### 2. メモリマップの設定
 リンカスクリプト等を編集して、poyo-v向けのメモリマップ設定をおこないます。poyo-vにおいては以下のようなメモリマップを想定しています。
 
-| アドレス | 容量 | 内容 |
-| --- | ---　| --- |
-| 0x00000-0x07FFF | 32KiB | なし |
-| 0x08000-0x0FFFF | 32KiB | .text(ROM) |
-| 0x10000-0x17FFF | 32KiB | .rodata + .data + .bss + .comment(RAM) |
-| 0x18000-0x1FFFF | 32KiB | stack(RAM) |
+|アドレス |容量 |内容 |対応する.hexファイル |
+|--- |--- |--- |--- |
+|0x00000-0x07FFF |32KiB |なし |software/${各プログラムのフォルダ名}/code.hex |
+|0x08000-0x0FFFF |32KiB |.text(ROM) |--- |
+|0x10000-0x17FFF |32KiB |.rodata + .data + .bss + .comment(RAM) |software/${各プログラムのフォルダ名}/data{0, 1, 2, 3}.hex |
+|0x18000-0x1FFFF |32KiB |stack(RAM) |software/${各プログラムのフォルダ名}/data{0, 1, 2, 3}.hex |
+
 
 ### 3. スタートアップルーチンの用意
 スタートアップルーチンを作成します。
