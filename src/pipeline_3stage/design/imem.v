@@ -7,8 +7,8 @@
 
 module imem(
     input wire clk,
-	input wire	[31:0] addr,
-	output wire [31:0] rd_data
+    input wire [31:0] addr,
+    output wire [31:0] rd_data
 );
 
     reg [31:0] mem [0:16383];  // 64KiB(16bitアドレス空間)

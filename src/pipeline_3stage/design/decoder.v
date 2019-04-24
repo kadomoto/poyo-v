@@ -6,17 +6,17 @@
 `include "define.vh"
 
 module decoder(
-    input  wire [31:0]  ir,
-    output wire  [4:0]	srcreg1_num,
-    output wire  [4:0]	srcreg2_num,
-    output wire  [4:0]	dstreg_num,
-    output wire [31:0]	imm,
-    output reg   [5:0]	alucode,
-    output reg   [1:0]	aluop1_type,
-    output reg   [1:0]	aluop2_type,
-    output reg	     	reg_we,
-    output reg			is_load,
-    output reg			is_store
+    input  wire [31:0] insn,
+    output wire [4:0] srcreg1_num,
+    output wire [4:0] srcreg2_num,
+    output wire [4:0] dstreg_num,
+    output wire [31:0] imm,
+    output reg [5:0] alucode,
+    output reg [1:0] aluop1_type,
+    output reg [1:0] aluop2_type,
+    output reg reg_we,
+    output reg is_load,
+    output reg is_store
 );
 
     // internal signal
@@ -31,24 +31,24 @@ module decoder(
     reg dst_type;
 
     // opcode
-    assign opcode = ir[6:0];
+    assign opcode = insn[6:0];
 
     // funct
-    assign funct3 = ir[14:12];
-    assign funct5 = ir[31:27];
+    assign funct3 = insn[14:12];
+    assign funct5 = insn[31:27];
     
     // destination
-    assign rd = ir[11:7];
+    assign rd = insn[11:7];
 
     // multiplexer
-    assign srcreg1_num = (op_type == `TYPE_U || op_type == `TYPE_J) ? 5'd0 : ir[19:15];
-    assign srcreg2_num = (op_type == `TYPE_U || op_type == `TYPE_J || op_type == `TYPE_I) ? 5'd0 : ir[24:20];
+    assign srcreg1_num = (op_type == `TYPE_U || op_type == `TYPE_J) ? 5'd0 : insn[19:15];
+    assign srcreg2_num = (op_type == `TYPE_U || op_type == `TYPE_J || op_type == `TYPE_I) ? 5'd0 : insn[24:20];
     assign dstreg_num = (dst_type == `REG_RD) ? rd : 5'd0;
-    assign imm = (op_type == `TYPE_U) ? {ir[31:12], {12'd0}} :
-                 (op_type == `TYPE_J) ? {{11{ir[31]}}, ir[31], ir[19:12], ir[20], ir[30:21], {1'd0}} :
-                 (op_type == `TYPE_I) ? {{20{ir[31]}}, ir[31:20]} :
-                 (op_type == `TYPE_B) ? {{19{ir[31]}}, ir[31], ir[7], ir[30:25], ir[11:8], {1'd0}} :
-                 (op_type == `TYPE_S) ? {{20{ir[31]}}, ir[31:25], ir[11:7]} : 32'd0;
+    assign imm = (op_type == `TYPE_U) ? {insn[31:12], {12'd0}} :
+                 (op_type == `TYPE_J) ? {{11{insn[31]}}, insn[31], insn[19:12], insn[20], insn[30:21], {1'd0}} :
+                 (op_type == `TYPE_I) ? {{20{insn[31]}}, insn[31:20]} :
+                 (op_type == `TYPE_B) ? {{19{insn[31]}}, insn[31], insn[7], insn[30:25], insn[11:8], {1'd0}} :
+                 (op_type == `TYPE_S) ? {{20{insn[31]}}, insn[31:25], insn[11:7]} : 32'd0;
 
     always @(*) begin
         case(opcode)

@@ -6,11 +6,11 @@
 `include "define.vh"
 
 module dmem #(parameter byte_num = 2'b00) (
-	input wire clk,
-	input wire we,
-	input wire [31:0] addr,
-	input wire [7:0] wr_data,
-	output wire [7:0] rd_data
+    input wire clk,
+    input wire we,
+    input wire [31:0] addr,
+    input wire [7:0] wr_data,
+    output wire [7:0] rd_data
 );
 
     reg [7:0] mem [0:16383];  // 64KiB(16bitアドレス空間)
@@ -25,11 +25,11 @@ module dmem #(parameter byte_num = 2'b00) (
         endcase
     end      
    
-	always @(posedge clk) begin
-		if (we) mem[addr[17:2]] <= wr_data;  // 書き込みタイミングをクロックと同期することでBRAM化
-		addr_sync <= addr[17:2];  // 読み出しアドレス更新をクロックと同期することでBRAM化
-	end
+    always @(posedge clk) begin
+        if (we) mem[addr[17:2]] <= wr_data;  // 書き込みタイミングをクロックと同期することでBRAM化
+        addr_sync <= addr[17:2];  // 読み出しアドレス更新をクロックと同期することでBRAM化
+    end
 
-	assign rd_data = mem[addr_sync];
+    assign rd_data = mem[addr_sync];
 
 endmodule
