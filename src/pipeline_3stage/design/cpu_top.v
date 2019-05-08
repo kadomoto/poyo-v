@@ -70,7 +70,7 @@ module cpu_top (
     assign decoder_insn = imem_rd_data;
 
     decoder decoder_0 (
-        .ir(decoder_insn),
+        .insn(decoder_insn),
         .srcreg1_num(decoder_srcreg1_num),
         .srcreg2_num(decoder_srcreg2_num),
         .dstreg_num(ex_dstreg_num),
