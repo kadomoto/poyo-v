@@ -139,4 +139,4 @@ poyo-vで読み込むための.hex形式へと変換をおこないます。poyo
 * **Ourfool in Saginomiya** -[homepage](http://www.saginomiya.xyz/)-
 
 ## License
-This project is licensed under the Apache-2.0 License - see the [LICENSE](LICENSE) file for details
+This project is released under the MIT License - see the [LICENSE](LICENSE) file for details
