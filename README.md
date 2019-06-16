@@ -1,7 +1,7 @@
 # poyo-v
 poyo-vはFPGAやASICに使えるRISC-Vソフトプロセッサです。誰でも容易に拡張・インプリメントできるインオーダ・スーパースカラプロセッサを目指してVerilog HDLで開発されています。
 
-*Poyo-v is a RISC-V soft processor developed for FPGAs and ASICs. It is being developed in Verilog HDL aiming at a general-purpose in-order superscalar processor which anyone can easily extend / implement.*
+*Poyo-v is a RISC-V soft processor developed for FPGAs and ASICs. It is being developed in Verilog HDL aiming at a general-purpose in-order superscalar processor that anyone can easily expand its function.*
 
 機能 |実装済 or まだ
 --- |---
@@ -66,7 +66,7 @@ RISC-V RV32I向けの実行ファイルを生成するソフトウェアツー�
 |0x00000-0x07FFF |32KiB |なし |software/${各プログラムのフォルダ名}/code.hex |
 |0x08000-0x0FFFF |32KiB |.text(ROM) |software/${各プログラムのフォルダ名}/code.hex |
 |0x10000-0x17FFF |32KiB |.rodata + .data + .bss + .comment(RAM) |software/${各プログラムのフォルダ名}/data{0, 1, 2, 3}.hex |
-|0x18000-0x1FFFF |32KiB |stack(RAM) |software/${各プログラムのフォルダ名}/data{0, 1, 2, 3}.hex |
+|0x18000-0x1FFFF |32KiB |stack(RAM) |なし |
 |0xF6FFF070 |. |uart用アドレス |なし |
 |0xFFFFFF00 |. |hardware counter用アドレス |なし |
 
@@ -108,7 +108,7 @@ poyo-vで読み込むための.hex形式へと変換をおこないます。poyo
 
 となります。
 
-一方、data{0, 1, 2, 3}.hexは、一行あたり1byteのデータ×16384行（4ファイル合計で64KiB）のテキストファイルです。
+一方、data{0, 1, 2, 3}.hexは、一行あたり1byteのデータ×8192行（4ファイル合計で32KiB）のテキストファイルです。
 
 |[3]番地 |[2]番地 |[1]番地 |[0]番地 |
 |:---: |:---: |:---: |:---: |
@@ -139,4 +139,4 @@ poyo-vで読み込むための.hex形式へと変換をおこないます。poyo
 * **Ourfool in Saginomiya** -[homepage](http://www.saginomiya.xyz/)-
 
 ## License
-This project is licensed under the Apache-2.0 License - see the [LICENSE](LICENSE) file for details
+This project is released under the MIT License - see the [LICENSE](LICENSE) file for details
