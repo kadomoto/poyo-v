@@ -22,7 +22,7 @@ module cpu_top (
     reg [31:0] PC;
 
     // ex stageの結果をフォワーディング
-    assign next_PC = ex_br_taken ? ex_br_addr + 32'd4 : PC + 32'd4;
+    assign next_PC = (rst_n == 1'b0) ? PC + 32'd4 : ex_br_taken ? ex_br_addr + 32'd4 : PC + 32'd4;
 
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
@@ -70,7 +70,7 @@ module cpu_top (
     assign decoder_insn = imem_rd_data;
 
     decoder decoder_0 (
-        .ir(decoder_insn),
+        .insn(decoder_insn),
         .srcreg1_num(decoder_srcreg1_num),
         .srcreg2_num(decoder_srcreg2_num),
         .dstreg_num(ex_dstreg_num),
