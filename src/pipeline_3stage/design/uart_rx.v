@@ -50,6 +50,16 @@ module uart_rx(
     assign start_pulse = ((edge_shift_reg[2:1] == 2'b10) && (busy == 1'b0)) ? 1'b1 : 1'b0;
     assign end_pulse = ((data_count == 4'd10) && (data_acq==1'b1)) ? 1'b1 : 1'b0;  // 11bit目の受信タイミング
 
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            busy <= 1'b0;
+        end else if (start_pulse) begin
+            busy <= 1'b1;
+        end else if (end_pulse) begin
+            busy <= 1'b0;
+        end
+    end
+
     // 受信データのビットカウンタ
     wire data_acq;
     reg [3:0] data_count;
@@ -62,7 +72,7 @@ module uart_rx(
         end else if (start_pulse) begin
             data_count <= 4'd0;
         end else if (data_acq) begin
-            cnt <= cnt + 1;  //インクリメント
+            data_count <= data_count + 4'd1;  //インクリメント
         end
     end
 
