@@ -8,6 +8,8 @@
 module cpu_top (
     input wire clk,
     input wire rst,
+    input wire [31:0] imem_rd_data_in,
+    output wire [15:0] imem_addr_out,
     output wire uart_tx
 );
 
@@ -41,11 +43,17 @@ module cpu_top (
     // ex stageの結果をフォワーディング
     assign imem_addr = (rst_n == 1'b0) ? 32'd0 : ex_br_taken ? ex_br_addr : PC;
 
+    /*  imemは外部モジュール
     imem imem (
         .clk(clk),
         .addr(imem_addr),
         .rd_data(imem_rd_data)
     );
+    */
+
+    // 外部入出力
+    assign imem_addr_out = imem_addr[15:0];
+    assign imem_rd_data = {{16'd0}, imem_rd_data_in};
     
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
@@ -226,7 +234,7 @@ module cpu_top (
         
     endfunction
 
-    dmem #(.byte_num(2'b00)) dmem_0 (
+    dmem dmem_0 (
         .clk(clk),
         .we(dmem_we[0]),
         .addr(dmem_addr),
@@ -234,7 +242,7 @@ module cpu_top (
         .rd_data(dmem_rd_data[0])
     );
     
-    dmem #(.byte_num(2'b01)) dmem_1 (
+    dmem dmem_1 (
         .clk(clk),
         .we(dmem_we[1]),
         .addr(dmem_addr),
@@ -242,7 +250,7 @@ module cpu_top (
         .rd_data(dmem_rd_data[1])
     );
     
-    dmem #(.byte_num(2'b10)) dmem_2 (
+    dmem dmem_2 (
         .clk(clk),
         .we(dmem_we[2]),
         .addr(dmem_addr),
@@ -250,7 +258,7 @@ module cpu_top (
         .rd_data(dmem_rd_data[2])
     );
     
-    dmem #(.byte_num(2'b11)) dmem_3 (
+    dmem dmem_3 (
         .clk(clk),
         .we(dmem_we[3]),
         .addr(dmem_addr),
