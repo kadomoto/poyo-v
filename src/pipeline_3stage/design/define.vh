@@ -6,6 +6,9 @@
 // プログラムが格納されたディレクトリの絶対パスを指定
 `define MEM_DATA_PATH "D:/Github/poyo-v/software/Coremark_for_50MHz/"
 
+// address for GPIO
+`define GPIO_ADDR 32'h50000000
+
 // address for hardware counter
 `define HARDWARE_COUNTER_ADDR 32'hffffff00
 

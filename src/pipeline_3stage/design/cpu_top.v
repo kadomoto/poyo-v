@@ -10,6 +10,7 @@ module cpu_top (
     input wire rst,
     input wire [31:0] imem_rd_data_in,
     output wire [15:0] imem_addr_out,
+    output wire [3:0] gpio_data_out,
     output wire uart_tx
 );
 
@@ -372,6 +373,24 @@ module cpu_top (
     endfunction
     
     assign wb_dstreg_value = wb_is_load ? wb_load_value : wb_alu_result;
+
+    // gpio
+    wire gpio_we;
+    wire [7:0] gpio_data_i;
+    wire [7:0] gpio_data_o;
+    assign gpio_data_i = ex_store_value[7:0];
+    assign gpio_we = ((ex_alu_result == `GPIO_ADDR) && (ex_is_store == `ENABLE)) ? 1'b1 : 1'b0;
+    
+    // 外部出力
+    assign gpio_data_out = gpio_data_o[3:0];
+
+    gpio gpio_0 (
+		.gpio_we(gpio_we),
+		.wr_data(gpio_data_i),
+		.clk(clk),
+		.rst_n(rst_n),
+		.gpio(gpio_data_o)
+    );
 
     // hardware counter
     hardware_counter hardware_counter_0 (
