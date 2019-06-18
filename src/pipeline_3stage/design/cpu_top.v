@@ -9,9 +9,10 @@ module cpu_top (
     input wire clk,
     input wire rst,
     input wire [31:0] imem_rd_data_in,
+    input wire uart_rx_i,
     output wire [15:0] imem_addr_out,
     output wire [3:0] gpio_data_out,
-    output wire uart_tx
+    output wire uart_tx_o
 );
 
     // reset
@@ -274,7 +275,7 @@ module cpu_top (
 
     assign uart_data_i = ex_store_value[7:0];
     assign uart_we = ((ex_alu_result == `UART_ADDR) && (ex_is_store == `ENABLE)) ? 1'b1 : 1'b0;
-    assign uart_tx = uart_data_o;
+    assign uart_tx_o = uart_data_o;
 
     uart uart_0 (
         .uart_we(uart_we),
@@ -310,15 +311,19 @@ module cpu_top (
     reg [31:0] wb_alu_result;
     wire [31:0] wb_load_value, wb_dstreg_value;
     wire [31:0] hc_value;
+    wire uart_re;
+    wire [7:0] uart_rd_data;
+    wire [31:0] uart_value;
     
-    assign wb_load_value = load_value_sel(wb_is_load, wb_alucode, wb_alu_result, dmem_rd_data[0], dmem_rd_data[1], dmem_rd_data[2], dmem_rd_data[3], hc_value);
+    assign wb_load_value = load_value_sel(wb_is_load, wb_alucode, wb_alu_result, dmem_rd_data[0], dmem_rd_data[1], dmem_rd_data[2], dmem_rd_data[3], hc_value, uart_value);
     
     function [31:0] load_value_sel(
         input is_load,
         input [5:0] alucode,
         input [31:0] alu_result,
         input [7:0] dmem_rd_data_0, dmem_rd_data_1, dmem_rd_data_2, dmem_rd_data_3,
-        input [31:0] hc_value
+        input [31:0] hc_value,
+        input [31:0] uart_value
     );
         
         begin
@@ -327,6 +332,8 @@ module cpu_top (
                     `ALU_LW: begin
                         if (alu_result == `HARDWARE_COUNTER_ADDR) begin
                             load_value_sel = hc_value;
+                        end else if (alu_result == `UART_RX_ADDR) begin
+                            load_value_sel = uart_value;
                         end else begin
                             load_value_sel = {dmem_rd_data_3, dmem_rd_data_2, dmem_rd_data_1, dmem_rd_data_0};
                         end
@@ -398,5 +405,16 @@ module cpu_top (
         .rst_n(rst_n),
         .out(hc_value)
     );
+
+    // uart rx
+    uart_rx uart_rx_0 (
+        .uart_rx(uart_rx_i),
+        .clk(clk),
+        .rst_n(rst_n),
+        .uart_re(uart_re),
+        .rd_data(uart_rd_data)
+    );
+
+    assign uart_value = {24'd0, uart_rd_data};
 
 endmodule

@@ -15,6 +15,7 @@
 
 // address for UART
 `define UART_ADDR 32'hf6fff070
+`define UART_RX_ADDR 32'h5fffff00
 
 `define ENABLE  1'b1
 `define DISABLE 1'b0
