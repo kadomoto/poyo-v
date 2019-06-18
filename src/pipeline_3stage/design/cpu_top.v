@@ -415,6 +415,6 @@ module cpu_top (
         .rd_data(uart_rd_data)
     );
 
-    assign uart_value = {24'd0, uart_rd_data};
+    assign uart_value = {{24'd0}, uart_rd_data};
 
 endmodule
