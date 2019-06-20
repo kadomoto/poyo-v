@@ -11,23 +11,23 @@ module uart_rx(
    output wire [7:0] rd_data
 );
 
-    // 50MHzのシステムクロックを115200HzのUART用クロックへ変換するためのカウンタ
-    // 434サイクル（9'h1b2サイクル、1/2すると8'hd9）
-    reg [8:0] clk_count;
+    // 24MHzのシステムクロックを1.5MHzのUART用クロックへ変換するためのカウンタ
+    // 16サイクル（4'hFサイクル、1/2すると4'h7）
+    reg [3:0] clk_count;
     
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            clk_count <= 9'd0;
+            clk_count <= 4'd0;
         end else if (start_pulse) begin
-            clk_count <= {1'b0, 8'hd9};  // スタート時は1/2周期だけずらす
+            clk_count <= 4'h7;  // スタート時は1/2周期だけずらす
         end else if (busy) begin
-            if (clk_count == 9'd0) begin
-                clk_count <= 9'h1b2;  // カウントが0になったら最初からカウント
+            if (clk_count == 4'd0) begin
+                clk_count <= 4'hF;  // カウントが0になったら最初からカウント
             end else begin
-                clk_count <= clk_count - 9'd1;  // デクリメント
+                clk_count <= clk_count - 4'd1;  // デクリメント
             end
         end else begin
-            clk_count <= 9'd0;
+            clk_count <= 4'd0;
         end
     end
 
@@ -64,7 +64,7 @@ module uart_rx(
     wire data_acq;
     reg [3:0] data_count;
 
-    assign data_acq = ((busy == 1'b1) && (clk_count == 9'd0)) ? 1'b1 : 1'b0;  // データ取得タイミング
+    assign data_acq = ((busy == 1'b1) && (clk_count == 4'd0)) ? 1'b1 : 1'b0;  // データ取得タイミング
 
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin

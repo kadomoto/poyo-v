@@ -16,7 +16,7 @@ module uart_tb;
     wire uart_re;
     wire [7:0] rd_data;
 
-    parameter CYCLE = 20;
+    parameter CYCLE = 42;  // 約24MHz
 
     always #(CYCLE/2) clk = ~clk;
 

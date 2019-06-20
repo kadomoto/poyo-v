@@ -20,11 +20,11 @@ module uart(
 
     reg [28:0] count;
   
-    // システムクロックを115200HzのUART用クロックへ変換（システムクロックが50MHzの場合は(115200 - 50000000)と記述）
-    wire [28:0] d = count[28] ? (115200) : (115200 - 50000000);  
+    // システムクロックを1.5MHzのUART用クロックへ変換（システムクロックが24MHzの場合は(1500000 - 24000000)と記述）
+    wire [28:0] d = count[28] ? (1500000) : (1500000 - 24000000);  
     wire [28:0] count_next = count + d;
     
-    assign uart_clk = ~count[28]; // 115200Hzクロック信号
+    assign uart_clk = ~count[28]; // 1500000Hzクロック信号
     
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
