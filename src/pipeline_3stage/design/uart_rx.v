@@ -14,6 +14,28 @@ module uart_rx(
     // 24MHzのシステムクロックを1.5MHzのUART用クロックへ変換するためのカウンタ
     // 16サイクル（4'hFサイクル、1/2すると4'h7）
     reg [3:0] clk_count;
+
+    // 受信データの立下りエッジ検出
+    reg [2:0] edge_shift_reg;
+
+    // 受信開始/終了パルス信号
+    wire start_pulse;
+    wire end_pulse;
+    reg busy;
+
+    // 受信データのビットカウンタ
+    wire data_acq;
+    reg [3:0] data_count;
+
+    // SerDes用フリップフロップ
+    reg [10:0] serdes_ff;
+
+    // 受信データチェック開始用信号
+    reg reception;
+    
+    // 受信データチェック
+    reg rd_en;
+    reg [7:0] data;
     
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
@@ -31,9 +53,6 @@ module uart_rx(
         end
     end
 
-    // 受信データの立下りエッジ検出
-    reg [2:0] edge_shift_reg;
-
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             edge_shift_reg[2:0] <= 3'd0;
@@ -41,11 +60,6 @@ module uart_rx(
             edge_shift_reg[2:0] <= {edge_shift_reg[1:0], uart_rx};
         end
     end
-
-    // 受信開始/終了パルス信号
-    wire start_pulse;
-    wire end_pulse;
-    reg busy;
 
     assign start_pulse = ((edge_shift_reg[2:1] == 2'b10) && (busy == 1'b0)) ? 1'b1 : 1'b0;
     assign end_pulse = ((data_count == 4'd10) && (data_acq==1'b1)) ? 1'b1 : 1'b0;  // 11bit目の受信タイミング
@@ -60,10 +74,6 @@ module uart_rx(
         end
     end
 
-    // 受信データのビットカウンタ
-    wire data_acq;
-    reg [3:0] data_count;
-
     assign data_acq = ((busy == 1'b1) && (clk_count == 4'd0)) ? 1'b1 : 1'b0;  // データ取得タイミング
 
     always @(posedge clk or negedge rst_n) begin
@@ -76,9 +86,6 @@ module uart_rx(
         end
     end
 
-    // SerDes用フリップフロップ
-    reg [10:0] serdes_ff;
-
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             serdes_ff <= 11'h7FF;  // 1埋め
@@ -87,9 +94,6 @@ module uart_rx(
         end
     end
 
-    // 受信データチェック開始用信号
-    reg reception;
-
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             reception <= 1'b0;
@@ -97,10 +101,6 @@ module uart_rx(
             reception <= end_pulse;
         end
     end
-
-    // 受信データチェック
-    reg rd_en;
-    reg [7:0] data;
 
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
