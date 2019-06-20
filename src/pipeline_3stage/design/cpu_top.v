@@ -25,6 +25,61 @@ module cpu_top (
     wire ex_br_taken;
     reg [31:0] PC;
 
+    // fetch stage
+    wire [31:0] imem_addr, imem_rd_data;
+    reg [31:0] ex_PC;
+
+    // execution stage
+
+    // decoder
+    wire [31:0] decoder_insn;
+    wire [4:0] decoder_srcreg1_num, decoder_srcreg2_num, ex_dstreg_num;
+    wire [31:0] decoder_imm;
+    wire [5:0] ex_alucode;
+    wire [1:0] ex_aluop1_type, ex_aluop2_type;
+    wire ex_reg_we, ex_is_load, ex_is_store;
+
+    // register file
+    wire regfile_we;
+    wire [4:0] regfile_srcreg1_num, regfile_srcreg2_num, regfile_dstreg_num;
+    wire [31:0] regfile_srcreg1_value, regfile_srcreg2_value, regfile_dstreg_value;
+
+    // ALU
+    wire [5:0] alu_alucode;
+    wire [31:0] alu_op1, alu_op2, ex_alu_result;
+    wire [31:0] ex_srcreg1_value, ex_srcreg2_value, ex_store_value;
+
+    // dmem
+    wire [3:0] dmem_we;
+    wire [31:0] dmem_addr;
+    wire [7:0] dmem_wr_data [3:0]; 
+    wire [7:0] dmem_rd_data [3:0];
+
+    // uart
+    wire uart_we;
+    wire [7:0] uart_data_i;
+    wire uart_data_o;
+
+    // writeback stage
+    reg wb_reg_we;
+    reg [31:0] wb_dstreg_num;
+    reg wb_is_load;
+    reg [5:0] wb_alucode;
+    reg [31:0] wb_alu_result;
+    wire [31:0] wb_load_value, wb_dstreg_value;
+    wire [31:0] hc_value;
+    wire uart_re;
+    wire [7:0] uart_rd_data;
+    wire [31:0] uart_value;
+
+    // gpio
+    wire gpio_we;
+    wire [7:0] gpio_data_i;
+    wire [7:0] gpio_data_o;
+    assign gpio_data_i = ex_store_value[7:0];
+    assign gpio_we = ((ex_alu_result == `GPIO_ADDR) && (ex_is_store == `ENABLE)) ? 1'b1 : 1'b0;
+    
+
     // ex stageの結果をフォワーディング
     assign next_PC = (rst_n == 1'b0) ? PC + 32'd4 : ex_br_taken ? ex_br_addr + 32'd4 : PC + 32'd4;
 
@@ -39,8 +94,6 @@ module cpu_top (
     //====================================================================
     // fetch stage
     //====================================================================
-    wire [31:0] imem_addr, imem_rd_data;
-    reg [31:0] ex_PC;
 
     // ex stageの結果をフォワーディング
     assign imem_addr = (rst_n == 1'b0) ? 32'd0 : ex_br_taken ? ex_br_addr : PC;
@@ -68,14 +121,6 @@ module cpu_top (
     //====================================================================
     // execution stage
     //====================================================================
-    
-    // decoder
-    wire [31:0] decoder_insn;
-    wire [4:0] decoder_srcreg1_num, decoder_srcreg2_num, ex_dstreg_num;
-    wire [31:0] decoder_imm;
-    wire [5:0] ex_alucode;
-    wire [1:0] ex_aluop1_type, ex_aluop2_type;
-    wire ex_reg_we, ex_is_load, ex_is_store;
 
     assign decoder_insn = imem_rd_data;
 
@@ -92,11 +137,6 @@ module cpu_top (
         .is_load(ex_is_load),
         .is_store(ex_is_store)
     );
-
-    // register file
-    wire regfile_we;
-    wire [4:0] regfile_srcreg1_num, regfile_srcreg2_num, regfile_dstreg_num;
-    wire [31:0] regfile_srcreg1_value, regfile_srcreg2_value, regfile_dstreg_value;
 
     assign regfile_srcreg1_num = decoder_srcreg1_num;
     assign regfile_srcreg2_num = decoder_srcreg2_num;
@@ -116,11 +156,6 @@ module cpu_top (
         .srcreg1_value(regfile_srcreg1_value),
         .srcreg2_value(regfile_srcreg2_value)
     );
-
-    // ALU
-    wire [5:0] alu_alucode;
-    wire [31:0] alu_op1, alu_op2, ex_alu_result;
-    wire [31:0] ex_srcreg1_value, ex_srcreg2_value, ex_store_value;
 
     assign alu_alucode = ex_alucode;
     assign ex_srcreg1_value = (regfile_srcreg1_num==5'd0) ? 32'd0 : 
@@ -151,12 +186,6 @@ module cpu_top (
                         (ex_alucode==`ALU_JALR) ? alu_op1 + decoder_imm :
                         ((ex_alucode==`ALU_BEQ) || (ex_alucode==`ALU_BNE) || (ex_alucode==`ALU_BLT) ||
                          (ex_alucode==`ALU_BGE) || (ex_alucode==`ALU_BLTU) || (ex_alucode==`ALU_BGEU)) ? ex_PC + decoder_imm: 32'd0;
-
-    // dmem
-    wire [3:0] dmem_we;
-    wire [31:0] dmem_addr;
-    wire [7:0] dmem_wr_data [3:0]; 
-    wire [7:0] dmem_rd_data [3:0];
     
     assign dmem_addr = ex_alu_result - 32'h10000;
     
@@ -267,11 +296,6 @@ module cpu_top (
         .wr_data(dmem_wr_data[3]),
         .rd_data(dmem_rd_data[3])
     );
-    
-    // uart
-    wire uart_we;
-    wire [7:0] uart_data_i;
-    wire uart_data_o;
 
     assign uart_data_i = ex_store_value[7:0];
     assign uart_we = ((ex_alu_result == `UART_ADDR) && (ex_is_store == `ENABLE)) ? 1'b1 : 1'b0;
@@ -304,16 +328,6 @@ module cpu_top (
     //====================================================================
     // writeback stage
     //====================================================================
-    reg wb_reg_we;
-    reg [31:0] wb_dstreg_num;
-    reg wb_is_load;
-    reg [5:0] wb_alucode;
-    reg [31:0] wb_alu_result;
-    wire [31:0] wb_load_value, wb_dstreg_value;
-    wire [31:0] hc_value;
-    wire uart_re;
-    wire [7:0] uart_rd_data;
-    wire [31:0] uart_value;
     
     assign wb_load_value = load_value_sel(wb_is_load, wb_alucode, wb_alu_result, dmem_rd_data[0], dmem_rd_data[1], dmem_rd_data[2], dmem_rd_data[3], hc_value, uart_value);
     
@@ -380,13 +394,6 @@ module cpu_top (
     endfunction
     
     assign wb_dstreg_value = wb_is_load ? wb_load_value : wb_alu_result;
-
-    // gpio
-    wire gpio_we;
-    wire [7:0] gpio_data_i;
-    wire [7:0] gpio_data_o;
-    assign gpio_data_i = ex_store_value[7:0];
-    assign gpio_we = ((ex_alu_result == `GPIO_ADDR) && (ex_is_store == `ENABLE)) ? 1'b1 : 1'b0;
     
     // 外部出力
     assign gpio_data_out = gpio_data_o[3:0];
