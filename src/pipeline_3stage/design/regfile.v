@@ -17,8 +17,8 @@ module regfile(
     reg [31:0] regfile [0:31];
 
     always @(posedge clk) begin
-        if (we) regfile[dstreg_num] <= dstreg_value;
-        regfile[0] = 32'd0;
+        if (we && (dstreg_num != 5'd0)) regfile[dstreg_num] <= dstreg_value;
+        regfile[0] <= 32'd0;
     end
     
     assign srcreg1_value = (srcreg1_num == 5'd0) ? 32'd0 : regfile[srcreg1_num];
