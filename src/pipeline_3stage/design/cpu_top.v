@@ -108,7 +108,7 @@ module cpu_top (
 
     // 外部入出力
     assign imem_addr_out = imem_addr[15:0];
-    assign imem_rd_data = {{16'd0}, imem_rd_data_in};
+    assign imem_rd_data = imem_rd_data_in;
     
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
