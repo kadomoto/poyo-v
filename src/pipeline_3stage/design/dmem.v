@@ -14,7 +14,7 @@ module dmem #(parameter byte_num = 2'b00) (
 );
 
     reg [7:0] mem [0:16383];  // 64KiB(16bitアドレス空間)
-    reg [15:0] addr_sync;  // 64KiBを表現するための16bitアドレス
+    reg [13:0] addr_sync;  // 64KiBを表現するための14bitアドレス(下位2bitはここでは考慮しない)
     
     initial begin
         case (byte_num)
@@ -26,8 +26,8 @@ module dmem #(parameter byte_num = 2'b00) (
     end      
    
     always @(posedge clk) begin
-        if (we) mem[addr[17:2]] <= wr_data;  // 書き込みタイミングをクロックと同期することでBRAM化
-        addr_sync <= addr[17:2];  // 読み出しアドレス更新をクロックと同期することでBRAM化
+        if (we) mem[addr[15:2]] <= wr_data;  // 書き込みタイミングをクロックと同期することでBRAM化
+        addr_sync <= addr[15:2];  // 読み出しアドレス更新をクロックと同期することでBRAM化
     end
 
     assign rd_data = mem[addr_sync];
