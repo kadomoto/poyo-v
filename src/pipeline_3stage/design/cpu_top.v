@@ -278,7 +278,7 @@ module cpu_top (
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
             wb_reg_we <= 1'b0;
-            wb_dstreg_num <= 32'd0;
+            wb_dstreg_num <= 5'd0;
             wb_is_load <= 1'b0;
             wb_alucode <= 6'd0;
             wb_alu_result <= 32'd0;
@@ -295,7 +295,7 @@ module cpu_top (
     // writeback stage
     //====================================================================
     reg wb_reg_we;
-    reg [31:0] wb_dstreg_num;
+    reg [5:0] wb_dstreg_num;
     reg wb_is_load;
     reg [5:0] wb_alucode;
     reg [31:0] wb_alu_result;
