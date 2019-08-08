@@ -3,7 +3,7 @@
 //
 
 
-module hardware_counter(
+module hardware_counter (
     input wire clk,
     input wire rst_n,
     output wire [31:0] out

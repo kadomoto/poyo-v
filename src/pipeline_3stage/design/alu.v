@@ -5,7 +5,7 @@
 
 `include "define.vh"
 
-module alu(
+module alu (
     input wire [5:0] alucode,
     input wire [31:0] op1,
     input wire [31:0] op2,
@@ -22,7 +22,7 @@ module alu(
     assign signed_op2 = op2;
 
     always @* begin
-        case(alucode)
+        case (alucode)
             `ALU_LUI: begin
                 alu_result = op2;
                 br_taken = `DISABLE;

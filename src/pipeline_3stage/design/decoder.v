@@ -5,7 +5,7 @@
 
 `include "define.vh"
 
-module decoder(
+module decoder (
     input  wire [31:0] insn,
     output wire [4:0] srcreg1_num,
     output wire [4:0] srcreg2_num,
@@ -51,7 +51,7 @@ module decoder(
                  (op_type == `TYPE_S) ? {{20{insn[31]}}, insn[31:25], insn[11:7]} : 32'd0;
 
     always @(*) begin
-        case(opcode)
+        case (opcode)
             `LUI: begin
                 alucode  =  `ALU_LUI;
                 reg_we   =  `ENABLE;
@@ -80,7 +80,7 @@ module decoder(
                 aluop2_type = `OP_TYPE_PC;
                 op_type  =  `TYPE_J;
                 dst_type =  `REG_RD;
-                case(dstreg_num)
+                case (dstreg_num)
                     5'b00000: begin
                         reg_we = `DISABLE;
                     end
@@ -98,7 +98,7 @@ module decoder(
                 aluop2_type = `OP_TYPE_PC;
                 op_type  =  `TYPE_I;
                 dst_type =  `REG_RD;
-                case(dstreg_num)
+                case (dstreg_num)
                     5'b00000: begin
                         reg_we = `DISABLE;
                     end
@@ -108,7 +108,7 @@ module decoder(
                 endcase
             end
             `BRANCH: begin                          
-                case(funct3)
+                case (funct3)
                     3'b000: begin  // BEQ
                         alucode  =  `ALU_BEQ;
                         reg_we   =  `DISABLE;
@@ -182,7 +182,7 @@ module decoder(
                 endcase
             end
             `LOAD: begin                          
-                case(funct3)
+                case (funct3)
                     3'b000: begin  // LB
                         alucode  =  `ALU_LB;
                         reg_we   =  `ENABLE;
@@ -246,7 +246,7 @@ module decoder(
                 endcase
             end
             `STORE: begin                          
-                case(funct3)
+                case (funct3)
                     3'b000: begin  // SB
                         alucode  =  `ALU_SB;
                         reg_we   =  `DISABLE;
@@ -290,7 +290,7 @@ module decoder(
                 endcase
             end                             
             `OPIMM: begin                          
-                case(funct3)
+                case (funct3)
                     3'b000: begin  // ADDI
                         alucode  =  `ALU_ADD;
                         reg_we   =  `ENABLE;
@@ -362,7 +362,7 @@ module decoder(
                         dst_type =  `REG_RD;
                     end
                     3'b101: begin
-                        case(funct5[3])
+                        case (funct5[3])
                             1'b0: begin  // SRLI
                                 alucode  =  `ALU_SRL;
                                 reg_we   =  `ENABLE;
@@ -388,9 +388,9 @@ module decoder(
                 endcase
             end
             `OP: begin                          
-                case(funct3)
+                case (funct3)
                     3'b000: begin
-                        case(funct5[3])
+                        case (funct5[3])
                             1'b0: begin  // ADD
                                 alucode  =  `ALU_ADD;
                                 reg_we   =  `ENABLE;
@@ -454,7 +454,7 @@ module decoder(
                         dst_type =  `REG_RD;
                     end
                     3'b101: begin
-                        case(funct5[3])
+                        case (funct5[3])
                             1'b0: begin  // SRL
                                 alucode  =  `ALU_SRL;
                                 reg_we   =  `ENABLE;

@@ -5,7 +5,7 @@
 
 `include "define.vh"
 
-module imem(
+module imem (
     input wire clk,
     input wire [31:0] addr,
     output wire [31:0] rd_data

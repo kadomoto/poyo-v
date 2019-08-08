@@ -3,7 +3,7 @@
 //
 
 
-module uart(
+module uart (
    input wire uart_we,
    input wire [7:0] wr_data,
    input wire clk,

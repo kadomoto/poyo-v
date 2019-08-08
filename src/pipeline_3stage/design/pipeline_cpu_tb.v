@@ -12,7 +12,7 @@ module pipeline_cpu_tb;
 
     always #(CYCLE/2) clk = ~clk;
 
-    cpu_top cpu_top(
+    cpu_top cpu_top (
        .clk(clk),
        .rst(rst)
     );

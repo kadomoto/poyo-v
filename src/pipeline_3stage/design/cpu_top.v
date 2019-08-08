@@ -25,7 +25,7 @@ module cpu_top (
     assign next_PC = (rst_n == 1'b0) ? PC + 32'd4 : ex_br_taken ? ex_br_addr + 32'd4 : PC + 32'd4;
 
     always @(posedge clk or negedge rst_n) begin
-        if(!rst_n) begin
+        if (!rst_n) begin
             PC <= 32'd0;
         end else begin
             PC <= next_PC;
@@ -276,7 +276,7 @@ module cpu_top (
     );
     
     always @(posedge clk or negedge rst_n) begin
-        if(!rst_n) begin
+        if (!rst_n) begin
             wb_reg_we <= 1'b0;
             wb_dstreg_num <= 5'd0;
             wb_is_load <= 1'b0;

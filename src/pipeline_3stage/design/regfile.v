@@ -3,7 +3,7 @@
 //
 
 
-module regfile(
+module regfile (
     input wire clk,
     input wire we,
     input wire [4:0] srcreg1_num,
