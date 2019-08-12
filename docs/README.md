@@ -46,7 +46,7 @@ RISC-Vプロセッサのメモリに読み込む.hexファイルのパスを環�
 ### 6. 動作確認
 サンプルプログラムは組み込み向けベンチマークの[Coremark](https://www.eembc.org/coremark/)です。`poyo-v/src/pipeline_3stage/constraint/const.xdc`内で指定されたUART用端子（Pmod Header JEのje[0]、最右上側の端子）とGND端子（Pmod Header JEの左から2番目、上側の端子）とをUSB-シリアル変換モジュールのRX端子とGND端子へそれぞれ接続し、PCへUSBケーブルを介してつなぐことで、UART出力をPC上のシリアルターミナルソフト（Teraterm、gtkterm、Arduino IDE付属のターミナル等）で確認することができます。シリアルターミナルソフトのbaudrateは115200に設定してください。
 
-<img src="https://github.com/ourfool/image-files/blob/master/poyo-v.jpg" width="600px">
+![image-title-here](https://github.com/ourfool/image-files/blob/master/poyo-v.jpg)
 
 各接続とターミナルソフトの設定を完了したら、動作確認をおこなうことができます。`poyo-v/src/pipeline_3stage/constraint/const.xdc`内で指定されたリセットボタン（btn[0]）を押すとプログラムが開始し、10秒ほどでシリアルターミナル上に完了のメッセージが表示されます。
 
