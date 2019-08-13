@@ -4,7 +4,10 @@ poyo-vはFPGAやASICに使えるRISC-Vソフトプロセッサです。誰でも
 
 *Poyo-v is a RISC-V soft processor developed for FPGAs and ASICs. It is being developed in Verilog HDL aiming at a general-purpose in-order superscalar processor that anyone can easily expand its function.*
 
-説明はこちら！ https://ourfool.github.io/poyo-v/
+詳細は下記リンクから！
+
+*View documentation, FAQ, help, examples, and more at
+https://ourfool.github.io/poyo-v/
  
 ## Author
 * **Ourfool in Saginomiya** -[homepage](http://www.saginomiya.xyz/)-
