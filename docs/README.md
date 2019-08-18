@@ -5,8 +5,8 @@ poyo-vはFPGAやASICに使えるRISC-Vソフトプロセッサです。誰でも
 
 機能 |実装済 or まだ
 --- |---
-ISA |RISC-V (RV32I)
-乗除算命令（M） |まだ
+ISA |RISC-V (RV32IM)
+乗除算命令（M） |✔
 単精度浮動小数点演算（F） |まだ
 アトミック命令（A） |まだ
 パイプライン化 *pipeline* |✔
