@@ -295,7 +295,7 @@ module cpu_top (
     // writeback stage
     //====================================================================
     reg wb_reg_we;
-    reg [5:0] wb_dstreg_num;
+    reg [4:0] wb_dstreg_num;
     reg wb_is_load;
     reg [5:0] wb_alucode;
     reg [31:0] wb_alu_result;
