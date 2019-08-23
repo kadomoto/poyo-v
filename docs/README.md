@@ -19,7 +19,7 @@ OS |まだ
 ### 動作環境
 - OS: Windows10 or Ubuntu18.04
 - Vivado: 2018.3
-- FPGAボード: [ZYBO Z7-10](http://akizukidenshi.com/catalog/g/gM-12552/)
+- FPGAボード: [ZYBO Z7-10](http://akizukidenshi.com/catalog/g/gM-12552/)等（[ZYBO Z7-20](http://akizukidenshi.com/catalog/g/gM-12553/)、{PYNQ-Z1](http://akizukidenshi.com/catalog/g/gM-13812/), [CMOD S7](http://akizukidenshi.com/catalog/g/gM-13487/)でも動作確認済。近年のXilinx社製FPGA搭載ボードであればほぼ全てで動作可能と思われます。）
 - USB-シリアル変換モジュール: [FT232RL](http://akizukidenshi.com/catalog/g/gK-01977/)等
 
 poyo-vをFPGA上で動かすためには、以下のような手順が必要です。
