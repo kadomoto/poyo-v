@@ -19,7 +19,7 @@ OS |まだ
 ### 動作環境
 - OS: Windows10 or Ubuntu18.04
 - Vivado: 2018.3
-- FPGAボード: [ZYBO Z7-10](http://akizukidenshi.com/catalog/g/gM-12552/)等（[ZYBO Z7-20](http://akizukidenshi.com/catalog/g/gM-12553/)、[PYNQ-Z1](http://akizukidenshi.com/catalog/g/gM-13812/), [CMOD S7](http://akizukidenshi.com/catalog/g/gM-13487/)でも動作確認済。近年のXilinx社製FPGA搭載ボードであればほぼ全てで動作可能と思われます。）
+- FPGAボード: [ZYBO Z7-10](http://akizukidenshi.com/catalog/g/gM-12552/)等（[ZYBO Z7-20](http://akizukidenshi.com/catalog/g/gM-12553/)、[PYNQ-Z1](http://akizukidenshi.com/catalog/g/gM-13812/), [CMOD S7](http://akizukidenshi.com/catalog/g/gM-13487/)でも動作確認済。近年のXilinx社製FPGA搭載ボードであればだいたいどれでも動作可能と思われます。poyo-vは特定のIPに依存しないよう基本的に全てのモジュールがVerilog HDLのソースによって記述されています。）
 - USB-シリアル変換モジュール: [FT232RL](http://akizukidenshi.com/catalog/g/gK-01977/)等
 
 poyo-vをFPGA上で動かすためには、以下のような手順が必要です。
@@ -68,7 +68,10 @@ RISC-V RV32I向けの実行ファイルを生成するソフトウェアツー�
 |0x10000-0x17FFF |32KiB |.rodata + .data + .bss + .comment(RAM) |software/${各プログラムのフォルダ名}/data{0, 1, 2, 3}.hex |
 |0x18000-0x1FFFF |32KiB |stack(RAM) |なし |
 |0x20010 |. |hardware counter用アドレス |なし |
-|0x20020 |. |uart用アドレス |なし |
+|0x20020 |. |uart送信用アドレス |なし |
+|0x20030 |. |uart受信用アドレス |なし |
+|0x20040 |. |汎用入力ピン用アドレス |なし |
+|0x20050 |. |汎用出力ピン用アドレス |なし |
 
 
 ### 3. スタートアップルーチンの用意
