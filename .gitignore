@@ -34,6 +34,13 @@
 #########
 !*.md
 !*.hex
+!*.s
+!*.h
+!*.c
+!*.py
+!*.script
+!Makefile
+!.inc
 #########
 #document files
 #########
