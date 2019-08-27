@@ -40,7 +40,7 @@
 !*.py
 !*.script
 !Makefile
-!.inc
+!*.inc
 #########
 #document files
 #########
