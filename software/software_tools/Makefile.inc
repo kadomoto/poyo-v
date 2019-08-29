@@ -3,10 +3,13 @@
 #
 
 # リポジトリのルートディレクトリの場所を環境に合わせて指定(要変更)
-PROJECT_ROOT = $(HOME)/work/poyo-v
+PROJECT_ROOT = $(HOME)/poyo-v
 
 # GCCのインストールパスを環境に合わせて指定(要変更)
 GCC_DIR = /opt/riscv
+
+# GCCのバージョンを環境に合わせて指定(要変更)
+GCC_VERSION = 9.2.0
 
 # 各種ファイルの場所を指定
 TEST_CODE_ROOT = .
@@ -46,7 +49,7 @@ LDFLAGS= \
 
 LIBC =
 LIBGCC = \
-	-L$(GCC_DIR)/lib/gcc/riscv32-unknown-elf/8.3.0 \
+	-L$(GCC_DIR)/lib/gcc/riscv32-unknown-elf/$(GCC_VERSION) \
 	-lgcc \
 	-lgcov \
 	-L$(GCC_DIR)/riscv32-unknown-elf/lib \
