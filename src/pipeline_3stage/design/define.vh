@@ -4,13 +4,29 @@
 
 
 // プログラムが格納されたディレクトリの絶対パスを指定
-`define MEM_DATA_PATH "D:/Github/poyo-v/software/Coremark_for_50MHz/"
+`define MEM_DATA_PATH "D:/Github/poyo-v/software/Coremark_RV32I_45MHz/"
+
+// システムクロックの周波数とその半分の値を指定
+`define SYSCLK_FREQ 45000000
+`define SYSCLK_FREQ_HALF 22500000
+
+// UARTのbaud rateを指定
+`define BAUD_RATE 115200
+
+// データメモリの開始アドレスと容量を指定
+`define DMEM_START_ADDR 32'h10000
+`define DMEM_SIZE 32'h10000
 
 // address for hardware counter
-`define HARDWARE_COUNTER_ADDR 32'hffffff00
+`define HARDWARE_COUNTER_ADDR 32'h20010
 
 // address for UART
-`define UART_ADDR 32'hf6fff070
+`define UART_TX_ADDR 32'h20020
+`define UART_RX_ADDR 32'h20030
+
+// address for GPIO
+`define GPI_ADDR 32'h20040
+`define GPO_ADDR 32'h20050
 
 `define ENABLE  1'b1
 `define DISABLE 1'b0

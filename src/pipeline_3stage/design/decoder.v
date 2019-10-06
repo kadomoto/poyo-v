@@ -6,7 +6,7 @@
 `include "define.vh"
 
 module decoder (
-    input  wire [31:0] insn,
+    input wire [31:0] insn,
     output wire [4:0] srcreg1_num,
     output wire [4:0] srcreg2_num,
     output wire [4:0] dstreg_num,
@@ -20,7 +20,6 @@ module decoder (
 );
 
     // internal signal
-    wire [25:0] addr;
     wire [6:0] opcode;
     wire [2:0] funct3;
     wire [4:0] funct5;
@@ -44,10 +43,10 @@ module decoder (
     assign srcreg1_num = (op_type == `TYPE_U || op_type == `TYPE_J) ? 5'd0 : insn[19:15];
     assign srcreg2_num = (op_type == `TYPE_U || op_type == `TYPE_J || op_type == `TYPE_I) ? 5'd0 : insn[24:20];
     assign dstreg_num = (dst_type == `REG_RD) ? rd : 5'd0;
-    assign imm = (op_type == `TYPE_U) ? {insn[31:12], {12'd0}} :
-                 (op_type == `TYPE_J) ? {{11{insn[31]}}, insn[31], insn[19:12], insn[20], insn[30:21], {1'd0}} :
+    assign imm = (op_type == `TYPE_U) ? {insn[31:12], 12'd0} :
+                 (op_type == `TYPE_J) ? {{11{insn[31]}}, insn[31], insn[19:12], insn[20], insn[30:21], 1'd0} :
                  (op_type == `TYPE_I) ? {{20{insn[31]}}, insn[31:20]} :
-                 (op_type == `TYPE_B) ? {{19{insn[31]}}, insn[31], insn[7], insn[30:25], insn[11:8], {1'd0}} :
+                 (op_type == `TYPE_B) ? {{19{insn[31]}}, insn[31], insn[7], insn[30:25], insn[11:8], 1'd0} :
                  (op_type == `TYPE_S) ? {{20{insn[31]}}, insn[31:25], insn[11:7]} : 32'd0;
 
     always @(*) begin

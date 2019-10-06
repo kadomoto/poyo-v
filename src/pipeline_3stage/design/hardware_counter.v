@@ -6,12 +6,12 @@
 module hardware_counter (
     input wire clk,
     input wire rst_n,
-    output wire [31:0] out
+    output wire [31:0] hc_out
 );
 
     reg [31:0] cycles;
 
-    assign out = cycles;
+    assign hc_out = cycles;
 
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin

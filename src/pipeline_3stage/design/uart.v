@@ -3,50 +3,76 @@
 //
 
 
+`include "define.vh"
+
 module uart (
-   input wire uart_we,
-   input wire [7:0] wr_data,
    input wire clk,
    input wire rst_n,
-   output reg uart_tx
+   input wire [7:0] wr_data,  // プロセッサから書き込まれるパラレルデータ
+   input wire uart_we,  // 書き込み有効
+   output reg uart_tx  // 送信シリアルデータ
 );
 
-    reg [3:0] bit_count;
-    reg [8:0] shifter;
-
+    // UART用クロック生成用信号
     wire uart_clk;
-    wire uart_busy = |bit_count[3:1];
-    wire sending = |bit_count;
+    reg [28:0] val;
+    wire [28:0] next_val;
+    wire [28:0] delta;
 
-    reg [28:0] count;
+    // シフトレジスタ関係
+    reg [3:0] bit_count;
+    reg [8:0] shift_reg;
+    wire en_seq;
   
-    // システムクロックを115200HzのUART用クロックへ変換（システムクロックが50MHzの場合は(115200 - 50000000)と記述）
-    wire [28:0] d = count[28] ? (115200) : (115200 - 50000000);  
-    wire [28:0] count_next = count + d;
+    // システムクロックをUART用クロックへ変換
+    assign delta = val[28] ? (`BAUD_RATE) : (`BAUD_RATE - `SYSCLK_FREQ);  
+    assign next_val = val + delta;
     
-    assign uart_clk = ~count[28]; // 115200Hzクロック信号
+    assign uart_clk = ~val[28];  // 1システムクロック幅だけ立ち上がるUART用クロック
     
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            count <= 29'b0;
+            val <= 29'b0;
         end else begin
-            count <= count_next;
+            val <= next_val;
         end
     end
 
+    // ビットカウンタ
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            bit_count <= 4'd0;
+        end else begin
+            if (uart_we && (!en_seq)) begin
+                bit_count <= 4'd11;  // スタート 1bit + データ 8bit + ストップ 2bit で 合計 11bit
+            end else if (uart_clk && en_seq) begin
+                bit_count <= bit_count - 4'd1;
+            end
+        end
+    end
+
+    assign en_seq = (bit_count != 4'd0);  // カウンタが0でなければ送信中
+
+    // シフトレジスタ
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            shift_reg <= 9'd0;
+        end else begin
+            if (uart_we && (!en_seq)) begin
+                shift_reg <= {wr_data[7:0], 1'd0};  // パラレルデータをシフトレジスタへ格納
+            end else if (uart_clk && en_seq) begin
+                shift_reg <= {1'd1, shift_reg[8:1]};
+            end
+        end
+    end
+
+    // データ送信
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             uart_tx <= 1'b1;
-            bit_count <= 4'd0;
-            shifter <= 9'd0;
         end else begin
-            if (uart_we & ~uart_busy) begin
-                shifter <= {wr_data[7:0], 1'd0};
-                bit_count <= 4'd11;  // 1 start bit + 8 data bit + 2 stop bit = 11bit
-            end
-            if (sending & uart_clk) begin
-                {shifter, uart_tx} <= {1'd1, shifter};
-                bit_count <= bit_count - 4'd1;
+            if (uart_clk && en_seq) begin
+                uart_tx <= shift_reg[0];
             end
         end
     end

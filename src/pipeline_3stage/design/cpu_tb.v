@@ -3,7 +3,7 @@
 //
 
 
-module pipeline_cpu_tb;
+module cpu_tb;
 
     reg clk;
     reg rst;
