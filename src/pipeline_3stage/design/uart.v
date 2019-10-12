@@ -8,9 +8,9 @@
 module uart (
    input wire clk,
    input wire rst_n,
-   input wire [7:0] wr_data,  // プロセッサから書き込まれるパラレルデータ
-   input wire uart_we,  // 書き込み有効
-   output reg uart_tx  // 送信シリアルデータ
+   input wire [7:0] wr_data,
+   input wire wr_en,
+   output reg uart_tx
 );
 
     // UART用クロック生成用信号
@@ -43,7 +43,7 @@ module uart (
         if (!rst_n) begin
             bit_count <= 4'd0;
         end else begin
-            if (uart_we && (!en_seq)) begin
+            if (wr_en && (!en_seq)) begin
                 bit_count <= 4'd11;  // スタート 1bit + データ 8bit + ストップ 2bit で 合計 11bit
             end else if (uart_clk && en_seq) begin
                 bit_count <= bit_count - 4'd1;
@@ -58,7 +58,7 @@ module uart (
         if (!rst_n) begin
             shift_reg <= 9'd0;
         end else begin
-            if (uart_we && (!en_seq)) begin
+            if (wr_en && (!en_seq)) begin
                 shift_reg <= {wr_data[7:0], 1'd0};  // パラレルデータをシフトレジスタへ格納
             end else if (uart_clk && en_seq) begin
                 shift_reg <= {1'd1, shift_reg[8:1]};

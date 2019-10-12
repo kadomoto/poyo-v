@@ -8,6 +8,7 @@
 module cpu_top (
     input wire clk,
     input wire rst,
+    input wire uart_rx,
     input wire [3:0] gpi_in,
     output wire [3:0] gpo_out,
     output wire uart_tx
@@ -58,7 +59,11 @@ module cpu_top (
     wire uart_we;
     wire [7:0] uart_data_in;
     wire uart_data_out;
-    wire uart_value;
+
+    // UART RX
+    wire uart_rd_en;
+    wire [7:0] uart_rd_data;
+    wire [31:0] uart_value;
 
     // GPIO
     wire [7:0] gpi_data_in;
@@ -308,13 +313,24 @@ module cpu_top (
         .clk(clk),
         .rst_n(rst_n),
         .wr_data(uart_data_in),
-        .uart_we(uart_we),
+        .wr_en(uart_we),
         .uart_tx(uart_data_out)
+    );
+
+    uart_rx uart_rx_0 (
+        .clk(clk),
+        .rst_n(rst_n),
+        .uart_rx(uart_rx),
+        .rd_data(uart_rd_data),
+        .rd_en(uart_rd_en)
     );
 
 
     // GPIO
     assign gpi_data_in = {4'd0, gpi_in};  // デフォルトでは汎用入力は4bit
+    assign gpo_data_in = ex_store_value[7:0];
+    assign gpo_we = ((ex_alu_result == `GPO_ADDR) && ex_is_store) ? `ENABLE : `DISABLE;
+    assign gpo_out = gpo_data_out[3:0];  // デフォルトでは汎用出力は4bit
 
     gpi gpi_0 (
 		.clk(clk),
@@ -322,10 +338,6 @@ module cpu_top (
 		.wr_data(gpi_data_in),
 		.gpi_out(gpi_data_out)
     );
-
-    assign gpo_data_in = ex_store_value[7:0];
-    assign gpo_we = ((ex_alu_result == `GPO_ADDR) && ex_is_store) ? `ENABLE : `DISABLE;
-    assign gpo_out = gpo_data_out[3:0];  // デフォルトでは汎用出力は4bit
 
     gpo gpo_0 (
 		.clk(clk),
@@ -368,7 +380,7 @@ module cpu_top (
     // 各種I/Oからのロード値
     assign gpi_value = {28'd0, gpi_data_out[3:0]};
     assign gpo_value = {28'd0, gpo_data_out[3:0]};
-    assign uart_value = {32'd0};
+    assign uart_value = {24'd0, uart_rd_data};
     
     function [31:0] load_value_sel(
         input is_load,
