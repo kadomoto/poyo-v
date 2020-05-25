@@ -24,7 +24,6 @@ $ git clone https://github.com/ourfool/poyo-v.git
 具体的な手順としては、Vivado上の「Flow Navigator」 の 「IP INTEGRATOR」→「Create Block Design」を選択します。ウィンドウ上の+ボタンを押して、追加したいIPコアを検索すると、Clocking Wizardが見つかります。Clocking Wizardを追加したのちウィンドウに表示されたブロック図をダブルクリックすると、種々の設定をおこなうことができます。「Output Clocks」を選択し、「Output Freq」を変更すると、入力したクロック信号の周波数が所望の値に変化して出力されます。作成済みのCPUモジュールと組み合わせるには、「Sources」内に表示されたモジュールの名前を右クリックし、「Add module to Block Design」を選択します。するとBlock Designのウィンドウ上にモジュールが現れます。モジュールの各ポートをクリックすることで、モジュール同士を接続する線が引けます。また、FPGA外部に信号を入出力するためのportは、ウィンドウ上で右クリックしてCreate Portとすると生成できます。Clocking wizardとトップモジュールとを組み合わせ終わったら、Design Sources 内に表示されているBlock Design の名前を右クリックしCreate HDL Wrapperを選択します。確認のウィンドウでOKを押すと、HDLで書かれたラッパーが生成されます。
 　最終的なFPGAへの書き込みの際には、このラッパーHDLを論理合成・配置配線していくことになります。ここで、論理合成・配置配線に用いるソースは太字で表示されています。HDLの名前を右クリックして、「Set as Top」を選択すると、名前が太字に変わり合成出来るようになります。最終的なファイル構成やブロックデザインの概形例を図に示します。
 
-
 ### 4. メモリデータパスの書き換え
 RISC-Vプロセッサのメモリに読み込む.hexファイルのパスを環境に合わせて修正します。修正する箇所は、`define.vh`内の`define MEM_DATA_PATH "D:/Github/poyo-v/software/Coremark_RV32I_45MHz/"`です。ローカル環境に合わせて
 `"D:/Github/poyo-v/software/Coremark_RV32I_45MHz/"`の場所を絶対パスで記述し直してください。
@@ -45,10 +44,55 @@ RISC-Vプロセッサのメモリに読み込む.hexファイルのパスを環�
 poyo-v上で動作するプログラムを作るためには、以下のような手順が必要です。
 
 ### 1. コンパイラツールチェーンの用意
-RISC-V RV32I向けの実行ファイルを生成するソフトウェアツールチェーンを用意します。gccの場合は[公式リポジトリ](https://github.com/riscv/riscv-gnu-toolchain)を参照してください。
+RISC-V RV32I向けの実行ファイルを生成するソフトウェアツールチェーンを用意します。gccの場合は[公式リポジトリ](https://github.com/riscv/riscv-gnu-toolchain)から導入することができます。これを利用することで、C言語で記述したコードをコンパイルしてRISC-V向けの実行ファイルを生成することができます。以降にクロスコンパイル環境を整えるための一連の作業を書いていきます。なお、開発環境としてはWSL（Windows Subsystem for Linux）、またはその他の仮想環境上でのUbuntuの利用を想定しています。
 
-### 2. メモリマップの設定
-リンカスクリプト等を編集して、poyo-v向けのメモリマップ設定をおこないます。poyo-vにおいては以下のようなメモリマップを想定しています。
+まずは、ツールチェーンをビルドするために必要な各種パッケージを入手します。下記のようなコマンドで各種パッケージをインストールします。
+
+```
+$ sudo apt update
+$ sudo apt install autoconf automake autotools-dev curl libmpc-dev libmpfr-dev libgmp-dev gawk build-essential bison flex texinfo gperf libtool patchutils bc zlib1g-dev libexpat-dev
+```
+
+続いて、公式のクロスコンパイラのリポジトリをクローンします。
+
+```
+$ git clone --recursive https://github.com/riscv/riscv-gnu-toolchain
+```
+
+クローン作業が完了したら、リポジトリ内へと移動してツールチェーンのビルド作業をおこないます。下記のようなコマンドを打つことでビルドできます。ここで、--prefix=/opt/riscvによってツールチェーンのインストール先を指定し、--with-arch=rv32gcによってRV32Iを含むRV32GC向けのクロスコンパイラを作ることを命じています。--with-abi=ilp32では浮動小数点演算はハードウェア側でサポートしない前提であることを伝えています。インストール先については変更しても問題ありません。ビルド時間は実行環境のコア数に合わせてmakeコマンド時に-jオプションを指定することで短縮できるかもしれません。
+
+```
+$ cd riscv-gnu-toolchain/
+$ ./configure --prefix=/opt/riscv --with-arch=rv32gc --with-abi=ilp32
+$ sudo make
+```
+
+問題が無ければ1時間程度で完了します。成功していれば下記のコマンドに応じて
+
+```
+$ /opt/riscv/bin/riscv32-unknown-elf-gcc --version
+riscv32-unknown-elf-gcc (GCC) 9.2.0
+Copyright (C) 2019 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions. There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+```
+
+のように表示されます。インストール先を変更した場合、/opt/riscvの部分は異なります。クロスコンパイラ自体も随時開発が進められているため、最新版に問題が生じる場合もあるかもしれません。その場合はクローン作業の代わりに、リポジトリのリリースページ（https://github.com/riscv/riscv-gnu-toolchain/releases）から既にリリースされているバージョン（2019年8月現在では、「v20180629」が最新リリース）のソースをダウンロードして使います。
+
+### 2. Make
+クロスコンパイラによって実行ファイルを生成し、そこからobjcopy等を利用して.bin形式のファイルを生成します、続いてこれを.hex形式へ変換し、命令メモリと4つのデータメモリ向けに分割することによって最終的に読み込む.hexファイルが揃います。この作業をまとめたMakeファイルが`software/test/
+Makefile`として用意されています。
+
+Makefileと同一の階層にC言語で記述されたコード（デフォルトではtest.cという名前に設定する。変更の場合は合わせてMakefile修正が必要）を用意し、
+
+```
+$ make
+```
+
+とすればメモリへ読み込み可能な各種.hexファイルが生成されます。
+
+### A. メモリ周りの詳細仕様
+poyo-vにおいては以下のようなメモリマップを想定しています。
 
 |アドレス |容量 |内容 |対応する.hexファイル |
 |--- |--- |--- |--- |
@@ -62,18 +106,7 @@ RISC-V RV32I向けの実行ファイルを生成するソフトウェアツー�
 |0x20040 |. |汎用入力ピン用アドレス |なし |
 |0x20050 |. |汎用出力ピン用アドレス |なし |
 
-
-### 3. スタートアップルーチンの用意
-スタートアップルーチンを作成します。
-
-### 4. コード記述
-動かしたいプログラムを記述します。
-
-### 5. コンパイル
-RISC-V RV32I向けの実行ファイルを生成します。可能であればIntel HEX等の形式に変換します。
- 
-### 6. .hex形式への変換
-poyo-vで読み込むための.hex形式へと変換をおこないます。poyo-vの読み込めるcode.hexファイル形式は、一行あたり4byteのデータ×16384行（合計64KiB）のテキストファイルです。一行あたり16進数で8文字が書かれており、一つの命令を表しています。たとえば、`0080006f`という行の場合は
+また、poyo-vの読み込めるcode.hexファイル形式は、一行あたり4byteのデータ×16384行（合計64KiB）のテキストファイルです。一行あたり16進数で8文字が書かれており、一つの命令を表しています。たとえば、`0080006f`という行の場合は
 
 |[3]番地 |[2]番地 |[1]番地 |[0]番地 |
 |:---: |:---: |:---: |:---: |
@@ -125,7 +158,7 @@ poyo-vで読み込むための.hex形式へと変換をおこないます。poyo
 |. |. |
 |n |data{x}.hex (x≡n(mod 4)) の {n/4+1} 行目 |
 
-となります。なお、poyo-vのデータメモリ（dmem.v）は実際には4つのインスタンスへと分割されて呼び出されており、それぞれのインスタンスが対応するファイルを読み込んでいます。
+となります。poyo-vのデータメモリ（dmem.v）は実際には4つのインスタンスへと分割されて呼び出されており、それぞれのインスタンスが対応するファイルを読み込んでいます。
  
 ## Author
 * **Ourfool in Saginomiya** -[homepage](http://www.saginomiya.xyz/)-
