@@ -81,11 +81,21 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 のように表示されます。インストール先を変更した場合、/opt/riscvの部分は異なります。クロスコンパイラ自体も随時開発が進められているため、最新版に問題が生じる場合もあるかもしれません。その場合はクローン作業の代わりに、リポジトリの[リリースページ](https://github.com/riscv/riscv-gnu-toolchain/releases)から既にリリースされているバージョン（2019年8月現在では、「v20180629」が最新リリース）のソースをダウンロードして使います。
 
 ### 2. makeによるビルド
-クロスコンパイラによって実行ファイルを生成し、そこからobjcopy等を利用して.bin形式のファイルを生成します、続いてこれを.hex形式へ変換し、命令メモリと4つのデータメモリ向けに分割することによって最終的に読み込む.hexファイルが揃います。この作業をまとめたMakeファイルが`software/test/Makefile`として用意されています。
+クロスコンパイラによって実行ファイルを生成し、そこからobjcopy等を利用して.bin形式のファイルを生成します、続いてこれを.hex形式へ変換し、命令メモリと4つのデータメモリ向けに分割することによって最終的に読み込む.hexファイルが揃います。この作業をまとめたMakeファイルの例が`software/test/Makefile`として用意されています。
 
-Makefileと同一の階層にC言語で記述されたコード（デフォルトではtest.cという名前に設定する。変更の場合は合わせてMakefile修正が必要）を用意した後、
+利用に先立って、Makefile実行用のインクルード・ファイル`software/software_tools/Makefile.inc`をローカル環境に合わせて修正する必要があります。
 
 ```
+$ cd software/software_tools/
+$ vi Makefile.inc
+```
+
+として、リポジトリのルート・ディレクトリの場所と先ほどGCCをインストールした場所、導入したGCCのバージョンを必要に応じて変更します。
+
+修正完了後に、Makefileと同一の階層にC言語で記述されたコード（デフォルトではtest.cという名前に設定する。変更の場合は合わせてMakefile修正が必要）を用意し、
+
+```
+$ cd software/test/
 $ make
 ```
 
