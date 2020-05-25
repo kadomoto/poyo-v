@@ -21,8 +21,9 @@ $ git clone https://github.com/ourfool/poyo-v.git
 
 ### 3. ブロックデザインでのクロックモジュール生成
 適切な周波数のクロックを生成するためVivadoのブロックデザインを利用してクロックモジュールを生成します。
-具体的な手順としては、Vivado上の「Flow Navigator」 の 「IP INTEGRATOR」→「Create Block Design」を選択します。ウィンドウ上の+ボタンを押して、追加したいIPコアを検索すると、Clocking Wizardが見つかります。Clocking Wizardを追加したのちウィンドウに表示されたブロック図をダブルクリックすると、種々の設定をおこなうことができます。「Output Clocks」を選択し、「Output Freq」を変更すると、入力したクロック信号の周波数が所望の値に変化して出力されます。作成済みのCPUモジュールと組み合わせるには、「Sources」内に表示されたモジュールの名前を右クリックし、「Add module to Block Design」を選択します。するとBlock Designのウィンドウ上にモジュールが現れます。モジュールの各ポートをクリックすることで、モジュール同士を接続する線が引けます。また、FPGA外部に信号を入出力するためのportは、ウィンドウ上で右クリックしてCreate Portとすると生成できます。Clocking wizardとトップモジュールとを組み合わせ終わったら、Design Sources 内に表示されているBlock Design の名前を右クリックしCreate HDL Wrapperを選択します。確認のウィンドウでOKを押すと、HDLで書かれたラッパーが生成されます。
-　最終的なFPGAへの書き込みの際には、このラッパーHDLを論理合成・配置配線していくことになります。ここで、論理合成・配置配線に用いるソースは太字で表示されています。HDLの名前を右クリックして、「Set as Top」を選択すると、名前が太字に変わり合成出来るようになります。最終的なファイル構成やブロックデザインの概形例を図に示します。
+具体的な手順としては、Vivado上の「Flow Navigator」 の 「IP INTEGRATOR」→「Create Block Design」を選択します。ウィンドウ上の+ボタンを押して、追加したいIPコアを検索すると、Clocking Wizardが見つかります。Clocking Wizardを追加したのちウィンドウに表示されたブロック図をダブルクリックすると、種々の設定をおこなうことができます。「Output Clocks」を選択し、「Output Freq」を変更すると、入力したクロック信号の周波数が所望の値に変化して出力されます。作成済みのCPUモジュールと組み合わせるには、「Sources」内に表示されたモジュールの名前を右クリックし、「Add module to Block Design」を選択します。するとBlock Designのウィンドウ上にモジュールが現れます。モジュールの各ポートをクリックすることで、モジュール同士を接続する線が引けます。また、FPGA外部に信号を入出力するためのportは、ウィンドウ上で右クリックしてCreate Portとすると生成できます。
+
+Clocking wizardとトップモジュールとを組み合わせ終わったら、Design Sources 内に表示されているBlock Design の名前を右クリックしCreate HDL Wrapperを選択します。確認のウィンドウでOKを押すと、HDLで書かれたラッパーが生成されます。最終的なFPGAへの書き込みの際には、このラッパーHDLを論理合成・配置配線していくことになります。ここで、論理合成・配置配線に用いるソースは太字で表示されています。HDLの名前を右クリックして、「Set as Top」を選択すると、名前が太字に変わり合成出来るようになります。
 
 ### 4. メモリデータパスの書き換え
 RISC-Vプロセッサのメモリに読み込む.hexファイルのパスを環境に合わせて修正します。修正する箇所は、`define.vh`内の`define MEM_DATA_PATH "D:/Github/poyo-v/software/Coremark_RV32I_45MHz/"`です。ローカル環境に合わせて
