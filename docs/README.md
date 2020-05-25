@@ -81,7 +81,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 のように表示されます。インストール先を変更した場合、/opt/riscvの部分は異なります。クロスコンパイラ自体も随時開発が進められているため、最新版に問題が生じる場合もあるかもしれません。その場合はクローン作業の代わりに、リポジトリの[リリースページ](https://github.com/riscv/riscv-gnu-toolchain/releases)から既にリリースされているバージョン（2019年8月現在では、「v20180629」が最新リリース）のソースをダウンロードして使います。
 
 ### 2. makeによるビルド
-クロスコンパイラによって実行ファイルを生成し、そこからobjcopy等を利用して.bin形式のファイルを生成します、続いてこれを.hex形式へ変換し、命令メモリと4つのデータメモリ向けに分割することによって最終的に読み込む.hexファイルが揃います。この作業をまとめたMakeファイルの例が`software/test/Makefile`として用意されています。
+クロスコンパイラによって実行ファイルを生成し、そこからobjcopy等を利用して.bin形式のファイルを生成します、続いてこれを.hex形式へ変換し、命令メモリと4つのデータメモリ向けに分割することによって最終的に読み込む.hexファイルが揃います。この作業をまとめたMakeファイルの例が`software/test/Makefile`として用意されています。おこなわれる作業の詳細については実際のMakefile`software/test/Makefile`やそのインクルードファイル`software/software_tools/Makefile.inc`、リンカスクリプト`software/software_tools/ld.script`、.hexファイルへの変換スクリプト`hex_converter.py`を参照してください。
 
 利用に先立って、Makefile実行用のインクルード・ファイル`software/software_tools/Makefile.inc`をローカル環境に合わせて修正する必要があります。
 
