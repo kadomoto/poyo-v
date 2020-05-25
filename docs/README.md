@@ -1,21 +1,5 @@
 # poyo-v
-poyo-vはFPGAやASICに使えるRISC-Vソフトプロセッサです。誰でも容易に拡張・インプリメントできるインオーダ・スーパースカラプロセッサを目指してVerilog HDLで開発されています。
-
-*Poyo-v is a RISC-V soft processor developed for FPGAs and ASICs. It is being developed in Verilog HDL aiming at a general-purpose in-order superscalar processor that anyone can easily expand its function.*
-
-機能 |実装済 or まだ
---- |---
-ISA |RISC-V (RV32IM)
-乗除算命令（M） |✔
-単精度浮動小数点演算（F） |まだ
-倍精度浮動小数点演算（D） |まだ
-アトミック命令（A） |まだ
-圧縮命令（C） |まだ
-パイプライン化 *pipeline* |✔
-スーパースカラ化 *superscalar* |✔
-キャッシュ *cache* |まだ
-特権関係  *Privileged Architecture* |まだ
-OS |まだ
+poyo-vはFPGAやASICに使えるRISC-Vソフトプロセッサです。RV32Iの一通りの命令を実行可能な3段パイプラインインオーダプロセッサになっています。
 
 ## Running poyo-v on an FPGA
 ### 動作環境
@@ -32,25 +16,28 @@ poyo-vをFPGA上で動かすためには、以下のような手順が必要で�
 $ git clone https://github.com/ourfool/poyo-v.git
 ```
 
-### 2. .tclの書き換え
-`poyo-v/tcl/poyo-v_pipeline_3stage.tcl`のはじめに書かれた`set origin_dir "D:/Github/poyo-v/tcl"`を修正します。ローカル環境に合わせて`poyo-v/tcl`の場所を絶対パスで記述し直してください。注意点としてはWindows環境の場合にも`/`区切りのパスで記述してください。
+### 2. Vivadoへのファイル読み込み
+新規プロジェクトを作成し、リポジトリ内の、`src/pipeline_3stage/design/`以下のファイルをソースとして、`poyo-v/src/pipeline_3stage/constraint/`以下を制約ファイルとして読み込みます。ここで制約ファイルは[CMOD S7](http://akizukidenshi.com/catalog/g/gM-13487/)向けのものになっているので、他のFPGAボードを利用する場合は合わせて各端子名を修正する必要があります。
 
-### 3. プロジェクト作成
-Vivadoを開き、上部タブの**Tools**→**Run Tcl Script**から`poyo-v/tcl/poyo-v_pipeline_3stage.tcl`ファイルを開くことで新規プロジェクトを作成します。
+### 3. ブロックデザインでのクロックモジュール生成
+適切な周波数のクロックを生成するためVivadoのブロックデザインを利用してクロックモジュールを生成します。
+具体的な手順としては、Vivado上の「Flow Navigator」 の 「IP INTEGRATOR」→「Create Block Design」を選択します。ウィンドウ上の+ボタンを押して、追加したいIPコアを検索すると、Clocking Wizardが見つかります。Clocking Wizardを追加したのちウィンドウに表示されたブロック図をダブルクリックすると、種々の設定をおこなうことができます。「Output Clocks」を選択し、「Output Freq」を変更すると、入力したクロック信号の周波数が所望の値に変化して出力されます。作成済みのCPUモジュールと組み合わせるには、「Sources」内に表示されたモジュールの名前を右クリックし、「Add module to Block Design」を選択します。するとBlock Designのウィンドウ上にモジュールが現れます。モジュールの各ポートをクリックすることで、モジュール同士を接続する線が引けます。また、FPGA外部に信号を入出力するためのportは、ウィンドウ上で右クリックしてCreate Portとすると生成できます。Clocking wizardとトップモジュールとを組み合わせ終わったら、Design Sources 内に表示されているBlock Design の名前を右クリックしCreate HDL Wrapperを選択します。確認のウィンドウでOKを押すと、HDLで書かれたラッパーが生成されます。
+　最終的なFPGAへの書き込みの際には、このラッパーHDLを論理合成・配置配線していくことになります。ここで、論理合成・配置配線に用いるソースは太字で表示されています。HDLの名前を右クリックして、「Set as Top」を選択すると、名前が太字に変わり合成出来るようになります。最終的なファイル構成やブロックデザインの概形例を図に示します。
+
 
 ### 4. メモリデータパスの書き換え
-RISC-Vプロセッサのメモリに読み込む.hexファイルのパスを環境に合わせて修正します。修正する箇所は、`poyo-v/src/pipeline_3stage/design/define.vh`内の`define MEM_DATA_PATH "D:/Github/poyo-v/software/Coremark_for_50MHz/"`です。ローカル環境に合わせて
-`poyo-v/software/Coremark_for_50MHz/"`の場所を絶対パスで記述し直してください。
+RISC-Vプロセッサのメモリに読み込む.hexファイルのパスを環境に合わせて修正します。修正する箇所は、`define.vh`内の`define MEM_DATA_PATH "D:/Github/poyo-v/software/Coremark_RV32I_45MHz/"`です。ローカル環境に合わせて
+`"D:/Github/poyo-v/software/Coremark_RV32I_45MHz/"`の場所を絶対パスで記述し直してください。
 
 ### 5. Bitstream生成・書き込み
 各ファイルの修正完了後に、作成したVivadoプロジェクト上で、左端の**Flow Navigator**から**PROGRAM AND DEBUG**→**Generate Bitstream**を選択してBitstreamを生成します。完了したらPCとFPGAボードとを接続し、**Open Hardware Manager**から**Program device**を選択してFPGAボードへと書き込みます。
 
 ### 6. 動作確認
-サンプルプログラムは組み込み向けベンチマークの[Coremark](https://www.eembc.org/coremark/)です。`poyo-v/src/pipeline_3stage/constraint/const.xdc`内で指定されたUART用端子（Pmod Header JEのje[0]、最右上側の端子）とGND端子（Pmod Header JEの左から2番目、上側の端子）とをUSB-シリアル変換モジュールのRX端子とGND端子へそれぞれ接続し、PCへUSBケーブルを介してつなぐことで、UART出力をPC上のシリアルターミナルソフト（Teraterm、gtkterm、Arduino IDE付属のターミナル等）で確認することができます。シリアルターミナルソフトのbaudrateは115200に設定してください。
+サンプルプログラムは組み込み向けベンチマークの[Coremark](https://www.eembc.org/coremark/)です。`const.xdc`内で指定されたUART用端子とGND端子とをUSB-シリアル変換モジュールのRX端子とGND端子へそれぞれ接続し、PCへUSBケーブルを介してつなぐことで、UART出力をPC上のシリアルターミナルソフト（Teraterm、gtkterm、Arduino IDE付属のターミナル等）で確認することができます。シリアルターミナルソフトのbaudrateは115200に設定してください。
 
 <img src="https://ourfool.github.io/poyo-v/figs/poyo-v.jpg" width="600px">
 
-各接続とターミナルソフトの設定を完了したら、動作確認をおこなうことができます。`poyo-v/src/pipeline_3stage/constraint/const.xdc`内で指定されたリセットボタン（btn[0]）を押すとプログラムが開始し、10秒ほどでシリアルターミナル上に完了のメッセージが表示されます。
+各接続とターミナルソフトの設定を完了したら、動作確認をおこなうことができます。`const.xdc`内で指定されたリセットボタンを押すとプログラムが開始し、10秒ほどでシリアルターミナル上に完了のメッセージが表示されます。
 
 <img src="https://ourfool.github.io/poyo-v/figs/poyo-v.png" width="600px">
 
