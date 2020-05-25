@@ -44,7 +44,7 @@ def code_split(file_name):
 
     f.close()
 
-    f0 = open("code_32k.hex", 'w', encoding="UTF-8")
+    f0 = open("code32k.hex", 'w', encoding="UTF-8")
     f0.writelines(line_list_0)
     f0.close()
 
