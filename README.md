@@ -9,7 +9,7 @@ poyo-vはFPGAやASICに使えるRISC-Vソフトプロセッサです。誰でも
 * [CQ出版社 トランジスタ技術 2019年12月号「一緒に作ろう! RISC-Vマイコンピュータ」](https://toragi.cqpub.co.jp/tabid/887/Default.aspx)
 * d.lab-VDEC設計チュートリアル
 
-の参考用で現在は更新を停止しています。
+の参考用となっており、現在は更新を停止しています。
 
 詳細は下記リンクから！
 
