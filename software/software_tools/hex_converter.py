@@ -38,8 +38,7 @@ def code_split(file_name):
     
     for i, line in enumerate(line_list):
         byte_list = list(line)
-        if i < 8192:
-        else:
+        if i > 8191:
             line_list_0.append(''.join(byte_list))
 
     f.close()
