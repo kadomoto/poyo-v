@@ -7,7 +7,9 @@
 
 module imem (
     input wire clk,
+    input wire we,
     input wire [31:0] addr,
+    input wire [31:0] wr_data,
     output wire [31:0] rd_data
 );
 
@@ -17,6 +19,7 @@ module imem (
     initial $readmemh({`MEM_DATA_PATH, "code.hex"}, mem);
      
     always @(posedge clk) begin
+        if (we) mem[addr[15:2]] <= wr_data;  // 書き込みタイミングをクロックと同期することでBRAM化
         addr_sync <= addr[15:2];  // 読み出しアドレス更新をクロックと同期することでBRAM化
     end
     
