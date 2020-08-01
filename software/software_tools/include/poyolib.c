@@ -78,9 +78,8 @@ int strncmp(const char *s1, const char *s2, int len) {
 int putc(unsigned char c) {
   if (c == '\n') {
     serial_write('\r');
-  } else {
-    serial_write(c);
-  }
+  } 
+  serial_write(c);
   return 0;
 }
 
