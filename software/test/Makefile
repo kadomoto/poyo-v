@@ -12,7 +12,7 @@ SRCS = $(SRC) $(INCLUDE_ROOT)/poyoio.c
 OBJS = $(SRCS:.c=.o)
 
 
-all: code.hex data.hex data0.hex data1.hex data2.hex data3.hex
+all: code.hex code32k.hex data.hex data0.hex data1.hex data2.hex data3.hex
 
 # オブジェクトファイル生成
 %.o: %.c Makefile
@@ -44,4 +44,4 @@ code.hex data.hex: app.hex
 
 .PHONY: clean
 clean:
-	rm $(OBJS) code.hex data.hex data0.hex data1.hex data2.hex data3.hex app.hex app.dump app.bin app.elf crt0.o -f
+	rm $(OBJS) code.hex code32k.hex data.hex data0.hex data1.hex data2.hex data3.hex app.hex app.dump app.bin app.elf crt0.o -f
