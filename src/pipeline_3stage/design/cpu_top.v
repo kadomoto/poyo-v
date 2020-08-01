@@ -114,7 +114,7 @@ module cpu_top (
 
     bootrom bootrom (
         .clk(clk),
-        .rd_addr(rom_rd_addr),
+        .addr(rom_rd_addr),
         .rd_data(rom_rd_data)
     );
 
