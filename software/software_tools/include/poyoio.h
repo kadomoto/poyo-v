@@ -17,7 +17,7 @@
 #define GPO_WRADDR (char*)0x20050
 #define GPO_RDADDR (int*)0x20050
 
-// poyo.c
+// poyoio.c
 void digital_write(int pin, int vol);
 int digital_read(int pin);
 void serial_write(char c);
