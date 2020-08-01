@@ -1,4 +1,5 @@
 #include <poyoio.h>
+#include <poyolib.h>
 
 
 int main() {
@@ -19,6 +20,8 @@ int main() {
         }
 
         delay(3000);
+
+        puts("Hello\n");
 
     }
 
