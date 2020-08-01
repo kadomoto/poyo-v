@@ -1,9 +1,10 @@
 //
-//  define.vh
+// define.vh
 //
 
 
 // プログラムが格納されたディレクトリの絶対パスを指定
+`define BOOTROM_DATA_PATH "D:/Github/poyo-v/software/"
 `define MEM_DATA_PATH "D:/Github/poyo-v/software/Coremark_RV32I_45MHz/"
 
 // システムクロックの周波数とその半分の値を指定
@@ -12,6 +13,14 @@
 
 // UARTのbaud rateを指定
 `define BAUD_RATE 115200
+
+// ブート用メモリの開始アドレスと容量を指定
+`define BOOTROM_START_ADDR 32'h0
+`define BOOTROM_SIZE 32'h8000
+
+// 命令メモリの開始アドレスと容量を指定
+`define IMEM_START_ADDR 32'h0
+`define IMEM_SIZE 32'h10000
 
 // データメモリの開始アドレスと容量を指定
 `define DMEM_START_ADDR 32'h10000
