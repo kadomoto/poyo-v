@@ -33,7 +33,7 @@ int serial_write_en() {
 }
 
 
-void serial_write(char c) {
+void serial_write(unsigned char c) {
     volatile int* output_addr = UART_TX_ADDR;
     //delay(UART_TX_DELAY_TIME);
     while (!serial_write_en()) {
