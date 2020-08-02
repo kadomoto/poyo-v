@@ -2,7 +2,6 @@
 
 
 void digital_write(int pin, int vol) {
-
     volatile char* output_addr = GPO_WRADDR;
     volatile int* input_addr = GPO_RDADDR;
 
@@ -17,7 +16,6 @@ void digital_write(int pin, int vol) {
 
 
 int digital_read(int pin) {
-
     volatile int* input_addr = GPI_ADDR;
     int vol;
 
@@ -29,28 +27,42 @@ int digital_read(int pin) {
 }
 
 
+int serial_write_en() {
+    volatile int* input_addr = UART_TX_ADDR;
+    return *input_addr;
+}
+
+
 void serial_write(char c) {
-
     volatile char* output_addr = UART_TX_ADDR;
-
-    delay(UART_TX_DELAY_TIME);
+    //delay(UART_TX_DELAY_TIME);
+    while (!serial_write_en()) {
+        ;
+    }
     *output_addr = c;
 }
 
 
-char serial_read() {
-    
+int serial_read_en() {
     volatile int* input_addr = UART_RX_ADDR;
-    char c;
+    return (*input_addr >> 8) & 1;
+}
 
+
+char serial_read() {
+    volatile int* input_addr = UART_RX_ADDR;
+    volatile char* output_addr = UART_RX_ADDR;
+    char c;
+    while (!serial_read_en()) {
+        ;
+    }
     c = *input_addr;
-    
+    *output_addr = 1;
     return c;
 }
 
 
-void delay(unsigned int time) {
-    
+void delay(unsigned int time) {   
     volatile unsigned int* input_addr = HARDWARE_COUNTER_ADDR;
     unsigned int start_cycle = *input_addr;
 
