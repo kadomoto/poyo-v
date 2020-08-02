@@ -17,14 +17,14 @@ int main() {
         serial_write('O');
     }
 
-    puts("\n\n")
+    puts("\n\n");
 
     while(1){
         puts("Press any key\n");
         char c;
         c = serial_read();
         putc(c);
-        puts("\n\n")
+        puts("\n\n");
     }
 
     return 0;
