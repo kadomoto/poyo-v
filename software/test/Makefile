@@ -7,7 +7,7 @@ include ../software_tools/Makefile.inc
 
 # C言語ソースコードファイルを指定
 SRC = test.c
-INCLUDES = $(INCLUDE_ROOT)/poyoio.c $(INCLUDE_ROOT)/poyolib.c
+INCLUDES = $(INCLUDE_ROOT)/poyoio.c $(INCLUDE_ROOT)/poyolib.c $(INCLUDE_ROOT)/xmodem.c
 
 SRCS = $(SRC) $(INCLUDES)
 OBJS = $(SRCS:.c=.o)
