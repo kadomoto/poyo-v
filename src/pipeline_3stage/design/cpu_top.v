@@ -60,13 +60,15 @@ module cpu_top (
 
     // UART TX
     wire uart_we;
+    wire uart_busy;
     wire [7:0] uart_data_in;
     wire uart_data_out;
 
     // UART RX
     wire uart_rd_en;
+    wire uart_rd_comp;
     wire [7:0] uart_rd_data;
-    wire [31:0] uart_value;
+    wire [31:0] uart_tx_value, uart_rx_value;
 
     // GPIO
     wire [7:0] gpi_data_in;
@@ -347,23 +349,25 @@ module cpu_top (
     assign uart_data_in = ex_store_value[7:0];
     assign uart_we = ((ex_alu_result == `UART_TX_ADDR) && ex_is_store) ? `ENABLE : `DISABLE;
     assign uart_tx = uart_data_out;
+    assign uart_rd_comp = ((ex_alu_result == `UART_RX_ADDR) && ex_is_store) ? ex_store_value[0] : 1'b0;
 
     uart uart_0 (
         .clk(clk),
         .rst_n(rst_n),
         .wr_data(uart_data_in),
         .wr_en(uart_we),
-        .uart_tx(uart_data_out)
+        .uart_tx(uart_data_out),
+        .busy(uart_busy)
     );
 
     uart_rx uart_rx_0 (
         .clk(clk),
         .rst_n(rst_n),
         .uart_rx(uart_rx),
+        .rd_comp(uart_rd_comp),
         .rd_data(uart_rd_data),
         .rd_en(uart_rd_en)
     );
-
 
     // GPIO
     assign gpi_data_in = {4'd0, gpi_in};  // デフォルトでは汎用入力は4bit
@@ -419,14 +423,15 @@ module cpu_top (
     // 各種I/Oからのロード値
     assign gpi_value = {28'd0, gpi_data_out[3:0]};
     assign gpo_value = {28'd0, gpo_data_out[3:0]};
-    assign uart_value = {24'd0, uart_rd_data};
+    assign uart_tx_value = {31'd0, uart_busy};
+    assign uart_rx_value = {23'd0, uart_rd_en, uart_rd_data};
     
     function [31:0] load_value_sel(
         input is_load,
         input [5:0] alucode,
         input [31:0] alu_result,
         input [7:0] dmem_rd_data_0, dmem_rd_data_1, dmem_rd_data_2, dmem_rd_data_3,
-        input [31:0] uart_value,
+        input [31:0] uart_tx_value, uart_rx_value,
         input [31:0] hc_value,
         input [31:0] gpi_value,
         input [31:0] gpo_value
@@ -438,8 +443,10 @@ module cpu_top (
                     `ALU_LW: begin
                         if (alu_result == `HARDWARE_COUNTER_ADDR) begin
                             load_value_sel = hc_value;
+                        end else if (alu_result == `UART_TX_ADDR) begin
+                            load_value_sel = uart_tx_value;
                         end else if (alu_result == `UART_RX_ADDR) begin
-                            load_value_sel = uart_value;
+                            load_value_sel = uart_rx_value;
                         end else if (alu_result == `GPI_ADDR) begin
                             load_value_sel = gpi_value;
                         end else if (alu_result == `GPO_ADDR) begin
@@ -490,7 +497,7 @@ module cpu_top (
     endfunction
 
     assign wb_load_value = load_value_sel(wb_is_load, wb_alucode, wb_alu_result, dmem_rd_data[0],
-                                          dmem_rd_data[1], dmem_rd_data[2], dmem_rd_data[3], uart_value, hc_value, gpi_value, gpo_value);
+                                          dmem_rd_data[1], dmem_rd_data[2], dmem_rd_data[3], uart_tx_value, uart_rx_value, hc_value, gpi_value, gpo_value);
     
     assign wb_dstreg_value = wb_is_load ? wb_load_value : wb_alu_result;
 

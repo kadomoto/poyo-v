@@ -10,7 +10,8 @@ module uart (
    input wire rst_n,
    input wire [7:0] wr_data,
    input wire wr_en,
-   output reg uart_tx
+   output reg uart_tx,
+   output wire busy
 );
 
     // UART用クロック生成用信号
@@ -76,5 +77,8 @@ module uart (
             end
         end
     end
+
+    // データ送信可否
+    assign busy = en_seq;  // シーケンス進行中は送信不可
 
 endmodule

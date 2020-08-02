@@ -9,6 +9,7 @@ module uart_rx(
     input wire clk,
     input wire rst_n,
     input wire uart_rx,
+    input wire rd_comp,
     output reg [7:0] rd_data,
     output reg rd_en
 );
@@ -122,8 +123,8 @@ module uart_rx(
             rd_en <= 1'b0;
         end else if (reception && data_valid) begin
             rd_en <= 1'b1;  // スタートビットとエンドビットが合っていれば受信完了
-        end else begin
-            rd_en <= 1'b0;        
+        end else if (rd_comp) begin
+            rd_en <= 1'b0;  // read_compがアサートされたらリセット      
         end
     end
 
