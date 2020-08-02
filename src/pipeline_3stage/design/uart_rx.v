@@ -101,6 +101,8 @@ module uart_rx(
             end else begin
                 reception <= 1'b0;
             end
+        end else if (rd_comp) begin
+            reception <= 1'b0;  // rd_compがアサートされたらリセット
         end
     end
 
@@ -123,8 +125,8 @@ module uart_rx(
             rd_en <= 1'b0;
         end else if (reception && data_valid) begin
             rd_en <= 1'b1;  // スタートビットとエンドビットが合っていれば受信完了
-        end else if (rd_comp) begin
-            rd_en <= 1'b0;  // read_compがアサートされたらリセット      
+        end else begin
+            rd_en <= 1'b0;  // receptionが0ならリセット  
         end
     end
 
