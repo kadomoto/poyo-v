@@ -23,6 +23,9 @@ int main() {
 
         puts("Hello\n");
 
+        char c;
+        c = serial_read();
+        putc(c);
     }
 
     return 0;
