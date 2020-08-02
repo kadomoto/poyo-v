@@ -49,7 +49,7 @@ module cpu_top (
     // ALU
     wire [5:0] alu_alucode;
     wire [31:0] alu_op1, alu_op2, ex_alu_result;
-    
+
     wire [31:0] ex_srcreg1_value, ex_srcreg2_value, ex_store_value;
 
     // dmem
