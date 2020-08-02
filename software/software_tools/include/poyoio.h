@@ -8,13 +8,13 @@
 #define HARDWARE_COUNT_FOR_ONE_MSEC 45000
 
 // UART関係の設定
-#define UART_TX_ADDR (char*)0x20020
+#define UART_TX_ADDR (int*)0x20020
 #define UART_TX_DELAY_TIME 1
 #define UART_RX_ADDR (int*)0x20030
 
 // GPIO関係の設定
 #define GPI_ADDR (int*)0x20040
-#define GPO_WRADDR (char*)0x20050
+#define GPO_WRADDR (int*)0x20050
 #define GPO_RDADDR (int*)0x20050
 
 // poyoio.c

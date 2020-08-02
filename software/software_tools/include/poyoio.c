@@ -2,7 +2,7 @@
 
 
 void digital_write(int pin, int vol) {
-    volatile char* output_addr = GPO_WRADDR;
+    volatile int* output_addr = GPO_WRADDR;
     volatile int* input_addr = GPO_RDADDR;
 
     // 0ビット目は0ピンの状態、1ビット目は1ピンの状態というように値を格納しているので、
@@ -29,12 +29,12 @@ int digital_read(int pin) {
 
 int serial_write_en() {
     volatile int* input_addr = UART_TX_ADDR;
-    return *input_addr;
+    return (1 - *input_addr);
 }
 
 
 void serial_write(char c) {
-    volatile char* output_addr = UART_TX_ADDR;
+    volatile int* output_addr = UART_TX_ADDR;
     //delay(UART_TX_DELAY_TIME);
     while (!serial_write_en()) {
         ;
@@ -51,7 +51,7 @@ int serial_read_en() {
 
 char serial_read() {
     volatile int* input_addr = UART_RX_ADDR;
-    volatile char* output_addr = UART_RX_ADDR;
+    volatile int* output_addr = UART_RX_ADDR;
     char c;
     while (!serial_read_en()) {
         ;
