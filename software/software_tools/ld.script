@@ -10,7 +10,7 @@ MEMORY {
 
 SECTIONS
 { 
-  .boot : { __boot_start = .; } > BOOT
+  .boot : { _boot_start = .; } > BOOT
   .text : { *(.text) } > ROM
   .rodata : { *(.rodata) } > RAM
   .data : { *(.data) } > RAM
