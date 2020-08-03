@@ -29,7 +29,7 @@ int main() {
     static char buf[16];
     static long size = -1;
     static unsigned char *loadbuf = ((void *)0);
-    extern int _boot_start;
+    extern int _rom_start;
 
     puts("kzload (kozos boot loader) started.\n");
 
@@ -38,7 +38,7 @@ int main() {
         gets(buf);
 
         if (!strcmp(buf, "load")) {
-            loadbuf = (char *)(&_boot_start);
+            loadbuf = (char *)(&_rom_start);
             size = xmodem_recv(loadbuf);
             if (size < 0) {
 	            puts("\nXMODEM receive error!\n");

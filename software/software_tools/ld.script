@@ -3,18 +3,20 @@ OUTPUT_ARCH("riscv")
 
 ENTRY(_start);
 MEMORY {
-  BOOT(rxai) : ORIGIN = 0x0000, LENGTH = 32k
-  ROM(wxai) : ORIGIN = 0x8000, LENGTH = 32k
-  RAM(wa) : ORIGIN = 0x10000, LENGTH = 32k
+  BOOTROM(rxai) : ORIGIN = 0x0000, LENGTH = 4k
+  BOOTRAM(rai) : ORIGIN = 0x1000, LENGTH = 512
+  ROM(wxai) : ORIGIN = 0x1200, LENGTH = 2k
+  RAM(wa) : ORIGIN = 0x1A00, LENGTH = 1k
 }
 
 SECTIONS { 
-  .boot : { _boot_start = .; } > BOOT
-  .text : { *(.text) } > ROM
-  .rodata : { *(.rodata) } > RAM
-  .data : { *(.data) } > RAM
+  .text : { *(.text) } > BOOTROM
+  .rodata : { *(.rodata) } > BOOTRAM
+  .data : { *(.data) } > BOOTRAM
   . = ALIGN(4);
   _bss_start = .;
-  .bss : {*(.bss)} > RAM
-  _bss_end = . ;
+  .bss : {*(.bss)} > BOOTRAM
+  _bss_end = .;
+  .rom : { _rom_start = .; } > ROM
+  .ram : { _ram_start = .; } > RAM
 }
