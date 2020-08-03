@@ -26,13 +26,10 @@ static int dump(char *buf, long size) {
 
 
 int main() {
-
     static char buf[16];
     static long size = -1;
-    static unsigned char *loadbuf = NULL;
-    //extern int buffer_start;
-
-    init();
+    static unsigned char *loadbuf = ((void *)0);
+    extern int _boot_start;
 
     puts("kzload (kozos boot loader) started.\n");
 
@@ -41,18 +38,26 @@ int main() {
         gets(buf);
 
         if (!strcmp(buf, "load")) {
-            //loadbuf = (char *)(&buffer_start);
-            //size = xmodem_recv(loadbuf);
-            //if (size < 0) {
-	            //puts("\nXMODEM receive error!\n");
-            //} else {
-	            //puts("\nXMODEM receive succeeded.\n");
-            //}
+            loadbuf = (char *)(&_boot_start);
+            size = xmodem_recv(loadbuf);
+            if (size < 0) {
+	            puts("\nXMODEM receive error!\n");
+            } else {
+	            puts("\nXMODEM receive succeeded.\n");
+            }
         } else if (!strcmp(buf, "dump")) {
             puts("size: ");
-            //putxval(size, 0);
+            putxval(size, 0);
             puts("\n");
-            //dump(loadbuf, size);
+            dump(loadbuf, size);
+        } else if (!strcmp(buf, "logo")) {
+            puts(" ####      #####     ####    #####\n");
+            puts("  ##      ##   ##   ##  ##  ##   ##\n");
+            puts("  ##      ##   ##  ##       ##   ##\n");
+            puts("  ##      ##   ##  ##       ##   ##\n");
+            puts("  ##   #  ##   ##  ##  ###  ##   ##\n");
+            puts("  ##  ##  ##   ##   ##  ##  ##   ##\n");
+            puts(" #######   #####     #####   #####\n");
         } else {
             puts("unknown.\n");
         }
