@@ -57,6 +57,8 @@ module cpu_top (
     wire [31:0] dmem_addr;
     wire [7:0] dmem_wr_data [3:0]; 
     wire [7:0] dmem_rd_data [3:0];
+    wire [31:0] ram_rd_addr, ram_rd_data;
+    wire [7:0] mem_rd_data [3:0];
 
     // UART TX
     wire uart_we;
@@ -141,7 +143,7 @@ module cpu_top (
     // execution stage
     //====================================================================
 
-    assign decoder_insn = (ex_PC < `BOOTROM_SIZE) ? rom_rd_data : imem_rd_data;
+    assign decoder_insn = (ex_PC < (`BOOTROM_START_ADDR + `BOOTROM_SIZE)) ? rom_rd_data : imem_rd_data;
 
     decoder decoder_0 (
         .insn(decoder_insn),
@@ -206,8 +208,9 @@ module cpu_top (
 
     
     // store
-    assign dmem_addr = ex_alu_result - `DMEM_START_ADDR;  // データメモリの読出しアドレスを変換
-    assign imem_wr_addr = ex_alu_result - `IMEM_START_ADDR;  // 命令メモリの読出しアドレスを変換
+    assign dmem_addr = ex_alu_result - `DMEM_START_ADDR;  // データメモリへの入力アドレスに変換
+    assign imem_wr_addr = ex_alu_result - `IMEM_START_ADDR;  // 命令メモリへの入力アドレスに変換
+    assign ram_rd_addr = ex_alu_result - `BOOTRAM_START_ADDR;  // ブート用データメモリへの入力アドレスに変換
 
     function [31:0] dmem_wr_data_sel(
         input is_store,
@@ -343,6 +346,13 @@ module cpu_top (
         .wr_data(dmem_wr_data[3]),
         .rd_data(dmem_rd_data[3])
     );
+
+
+    bootram bootram (
+        .clk(clk),
+        .addr(ram_rd_addr),
+        .rd_data(ram_rd_data)
+    );
     
 
     // UART
@@ -420,6 +430,16 @@ module cpu_top (
     // write-back stage
     //====================================================================
 
+    // メモリからのロード値
+    assign mem_rd_data[0] = ((`BOOTRAM_START_ADDR <= wb_alu_result) &&
+                             (wb_alu_result < (`BOOTRAM_START_ADDR + `BOOTRAM_SIZE))) ? ram_rd_data[7:0] : dmem_rd_data[0];
+    assign mem_rd_data[1] = ((`BOOTRAM_START_ADDR <= wb_alu_result) &&
+                             (wb_alu_result < (`BOOTRAM_START_ADDR + `BOOTRAM_SIZE))) ? ram_rd_data[15:8] : dmem_rd_data[1];
+    assign mem_rd_data[2] = ((`BOOTRAM_START_ADDR <= wb_alu_result) &&
+                             (wb_alu_result < (`BOOTRAM_START_ADDR + `BOOTRAM_SIZE))) ? ram_rd_data[23:16] : dmem_rd_data[2];
+    assign mem_rd_data[3] = ((`BOOTRAM_START_ADDR <= wb_alu_result) &&
+                             (wb_alu_result < (`BOOTRAM_START_ADDR + `BOOTRAM_SIZE))) ? ram_rd_data[31:24] : dmem_rd_data[3];
+
     // 各種I/Oからのロード値
     assign gpi_value = {28'd0, gpi_data_out[3:0]};
     assign gpo_value = {28'd0, gpo_data_out[3:0]};
@@ -496,8 +516,8 @@ module cpu_top (
         
     endfunction
 
-    assign wb_load_value = load_value_sel(wb_is_load, wb_alucode, wb_alu_result, dmem_rd_data[0],
-                                          dmem_rd_data[1], dmem_rd_data[2], dmem_rd_data[3], uart_tx_value, uart_rx_value, hc_value, gpi_value, gpo_value);
+    assign wb_load_value = load_value_sel(wb_is_load, wb_alucode, wb_alu_result, mem_rd_data[0],
+                                          mem_rd_data[1], mem_rd_data[2], mem_rd_data[3], uart_tx_value, uart_rx_value, hc_value, gpi_value, gpo_value);
     
     assign wb_dstreg_value = wb_is_load ? wb_load_value : wb_alu_result;
 
