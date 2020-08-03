@@ -8,14 +8,13 @@ MEMORY {
   RAM(wa) : ORIGIN = 0x10000, LENGTH = 32k
 }
 
-SECTIONS
-{ 
+SECTIONS { 
   .boot : { _boot_start = .; } > BOOT
   .text : { *(.text) } > ROM
   .rodata : { *(.rodata) } > RAM
   .data : { *(.data) } > RAM
   . = ALIGN(4);
-  __bss_start = .;
+  _bss_start = .;
   .bss : {*(.bss)} > RAM
-  __bss_end = . ;
+  _bss_end = . ;
 }
