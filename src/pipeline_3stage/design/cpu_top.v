@@ -207,7 +207,7 @@ module cpu_top (
                          (ex_alucode == `ALU_BGE) || (ex_alucode == `ALU_BLTU) || (ex_alucode == `ALU_BGEU)) ? ex_PC + decoder_imm : 32'd0;
 
     
-    // store
+    // メモリアクセス
     assign dmem_addr = ex_alu_result - `DMEM_START_ADDR;  // データメモリへの入力アドレスに変換
     assign imem_wr_addr = ex_alu_result - `IMEM_START_ADDR;  // 命令メモリへの入力アドレスに変換
     assign ram_rd_addr = ex_alu_result - `BOOTRAM_START_ADDR;  // ブート用データメモリへの入力アドレスに変換
