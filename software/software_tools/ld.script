@@ -12,10 +12,10 @@ MEMORY {
 SECTIONS { 
   .text : { *(.text) } > BOOTROM
   .rodata : { *(.rodata) } > BOOTRAM
-  .data : { *(.data) } > BOOTRAM
+  .data : { *(.data) } > RAM
   . = ALIGN(4);
   _bss_start = .;
-  .bss : {*(.bss)} > BOOTRAM
+  .bss : {*(.bss)} > RAM
   _bss_end = .;
   .rom : { _rom_start = .; } > ROM
   .ram : { _ram_start = .; } > RAM
