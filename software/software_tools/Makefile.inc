@@ -3,13 +3,13 @@
 #
 
 # リポジトリのルートディレクトリの場所を環境に合わせて指定(要変更)
-PROJECT_ROOT = $(HOME)/poyo-v
+PROJECT_ROOT = $(HOME)/Git/poyo-v
 
 # GCCのインストールパスを環境に合わせて指定(要変更)
 GCC_DIR = /opt/riscv
 
 # GCCのバージョンを環境に合わせて指定(要変更)
-GCC_VERSION = 9.2.0
+GCC_VERSION = 10.1.0
 
 # 各種ファイルの場所を指定
 TEST_CODE_ROOT = .
