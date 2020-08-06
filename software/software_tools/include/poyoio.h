@@ -23,7 +23,7 @@ int digital_read(int pin);
 int serial_write_en();
 void serial_write(unsigned char c);
 int serial_read_en();
-char serial_read();
+unsigned char serial_read();
 void delay(unsigned int time);
 
 

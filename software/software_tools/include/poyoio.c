@@ -48,10 +48,10 @@ int serial_read_en() {
 }
 
 
-char serial_read() {
+unsigned char serial_read() {
     volatile unsigned int* input_addr = UART_RX_ADDR;
     volatile unsigned int* output_addr = UART_RX_ADDR;
-    char c;
+    unsigned char c;
     while (!serial_read_en()) {
         ;
     }
