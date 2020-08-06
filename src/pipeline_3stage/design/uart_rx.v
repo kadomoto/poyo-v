@@ -10,7 +10,7 @@ module uart_rx(
     input wire rst_n,
     input wire uart_rx,
     input wire rd_comp,
-    output reg [7:0] rd_data,
+    output wire [7:0] rd_data,
     output reg rd_en
 );
 
@@ -36,6 +36,18 @@ module uart_rx(
     // 受信データチェック用信号
     reg reception;
     wire data_valid;
+
+    // FIFO
+    // reg [7:0] data_buf [0:255];  // 256バイトのバッファ
+    // wire [8:0] byte_count;
+    // wire full, empty;
+    // reg [8:0] wr_count, rd_count;
+    // wire [7:0] wr_ptr, rd_ptr;
+    reg [7:0] data_buf [0:63];  // 64バイトのバッファ
+    wire [6:0] byte_count;
+    wire full, empty;
+    reg [6:0] wr_count, rd_count;
+    wire [5:0] wr_ptr, rd_ptr;
 
 
     // システムクロックをUART用クロックへ変換
@@ -101,32 +113,44 @@ module uart_rx(
             end else begin
                 reception <= 1'b0;
             end
-        end else if (rd_comp) begin
-            reception <= 1'b0;  // rd_compがアサートされたらリセット
+        end else begin
+            reception <= 1'b0;
         end
-    end
+    end  
 
     assign data_valid = ((shift_reg[0] == 1'b0) && (shift_reg[10:9] == 2'b11));  // スタート/エンドビットのチェック
 
-    // 受信データ
+    // FIFO
+    assign rd_data = data_buf[rd_ptr];
+    assign byte_count = (wr_count - rd_count);
+    assign full = byte_count[6]; 
+    assign empty = (byte_count == 7'd0);
+    assign wr_ptr = wr_count[5:0];  
+    assign rd_ptr = rd_count[5:0];
+
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            rd_data <= 8'd0;
-        end else if (reception && data_valid) begin
-            rd_data <= shift_reg[8:1];  // スタートビットとエンドビットが合っていればデータ読み出し
-        end else begin     
-            rd_data <= rd_data;
+            wr_count <= 7'd0;
+            rd_count <= 7'd0;
+        end else begin
+            if (reception && data_valid) begin
+                data_buf[wr_ptr] <= shift_reg[8:1];  // スタートビットとエンドビットが合っていればデータ書き込み
+                wr_count <= wr_count + 7'd1;  // ポインタ進める
+            end
+            if (rd_comp && (!empty)) begin
+                rd_count <= rd_count + 7'd1;  // ポインタ進める 
+            end     
         end
-    end
+    end 
 
     // データ読出し可否
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             rd_en <= 1'b0;
-        end else if (reception && data_valid) begin
-            rd_en <= 1'b1;  // スタートビットとエンドビットが合っていれば受信完了
+        end else if (!empty) begin
+            rd_en <= 1'b1;  // emptyで無ければ読出し可
         end else begin
-            rd_en <= 1'b0;  // receptionが0ならリセット  
+            rd_en <= 1'b0;  // emptyなら読出し不可  
         end
     end
 

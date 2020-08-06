@@ -17,9 +17,12 @@ static int xmodem_wait(void) {
     long cnt = 0;
 
     while (!serial_read_en()) {
-        delay(10000);
-        serial_write(XMODEM_NAK);
+        if (++cnt >= 30000000) {
+            cnt = 0;
+            serial_write(XMODEM_NAK);
+        }
     }
+
     return 0;
 }
 

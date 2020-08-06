@@ -32,30 +32,30 @@ int main() {
     extern int _ram_start;
 
     while (1) {
-        puts("kzload> ");
+        puts("root# ");
         gets(buf);
 
         if (!strcmp(buf, "load")) {
             loadbuf = (char *)(&_ram_start);
             size = xmodem_recv(loadbuf);
             if (size < 0) {
-	            puts("\nXMODEM receive error!\n");
+	            puts("\nXMODEM transfer error!\n");
             } else {
-	            puts("\nXMODEM receive succeeded.\n");
+	            puts("\nXMODEM transfer complete\n");
             }
         } else if (!strcmp(buf, "dump")) {
             puts("size: ");
             putxval(size, 0);
             puts("\n");
             dump(loadbuf, size);
-        } else if (!strcmp(buf, "logo")) {
-            puts(" ####      #####     ####    #####\n");
-            puts("  ##      ##   ##   ##  ##  ##   ##\n");
-            puts("  ##      ##   ##  ##       ##   ##\n");
-            puts("  ##      ##   ##  ##       ##   ##\n");
-            puts("  ##   #  ##   ##  ##  ###  ##   ##\n");
-            puts("  ##  ##  ##   ##   ##  ##  ##   ##\n");
-            puts(" #######   #####     #####   #####\n");
+        } else if (!strcmp(buf, "screenfetch")) {
+            puts(" ######    #####   ##  ##    #####\n");
+            puts("  ##  ##  ##   ##  ##  ##   ##   ##\n");
+            puts("  ##  ##  ##   ##  ##  ##   ##   ##\n");
+            puts("  #####   ##   ##   ####    ##   ##\n");
+            puts("  ##      ##   ##    ##     ##   ##\n");
+            puts("  ##      ##   ##    ##     ##   ##\n");
+            puts(" ####      #####    ####     #####\n");
         } else {
             puts("unknown.\n");
         }

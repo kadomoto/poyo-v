@@ -9,8 +9,8 @@
 `define MEM_DATA_PATH "D:/Github/poyo-v/software/test/"
 
 // システムクロックの周波数とその半分の値を指定
-`define SYSCLK_FREQ 45000000
-`define SYSCLK_FREQ_HALF 22500000
+`define SYSCLK_FREQ 40000000
+`define SYSCLK_FREQ_HALF 20000000
 
 // UARTのbaud rateを指定
 `define BAUD_RATE 115200
