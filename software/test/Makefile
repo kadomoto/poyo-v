@@ -7,13 +7,13 @@ include ../software_tools/Makefile.inc
 
 # C言語ソースコードファイルを指定
 SRC = test.c
-INCLUDES = $(INCLUDE_ROOT)/poyoio.c $(INCLUDE_ROOT)/poyolib.c $(INCLUDE_ROOT)/xmodem.c
+INCLUDES = $(INCLUDE_ROOT)/poyoio.c $(INCLUDE_ROOT)/poyolib.c
 
 SRCS = $(SRC) $(INCLUDES)
 OBJS = $(SRCS:.c=.o)
 
 
-all: code.hex code32k.hex data.hex data0.hex data1.hex data2.hex data3.hex
+all: code.hex data.hex
 
 # オブジェクトファイル生成
 %.o: %.c Makefile
@@ -43,4 +43,4 @@ code.hex data.hex: app.hex
 
 .PHONY: clean
 clean:
-	rm $(OBJS) code.hex code32k.hex data.hex data0.hex data1.hex data2.hex data3.hex app.hex app.dump app.bin app.elf crt0.o -f
+	rm $(OBJS) code.hex data.hex app.hex app.dump app.bin app.elf crt0.o -f

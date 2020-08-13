@@ -5,18 +5,32 @@ ENTRY(_start);
 MEMORY {
   BOOTROM(rxai) : ORIGIN = 0x0000, LENGTH = 4k
   BOOTRAM(rai) : ORIGIN = 0x1000, LENGTH = 512
-  ROM(wxai) : ORIGIN = 0x1200, LENGTH = 2k
+  ROM(wxa) : ORIGIN = 0x1200, LENGTH = 2k
   RAM(wa) : ORIGIN = 0x1A00, LENGTH = 1k
 }
 
 SECTIONS { 
-  .text : { *(.text) } > BOOTROM
-  .rodata : { *(.rodata) } > BOOTRAM
-  .data : { *(.data) } > RAM
+  .text : { *(.text) } > ROM
+
+  .rodata : {
+    _rodata_start = .;
+    *(.rodata*)
+    . = ALIGN(4);
+    _rodata_end = .;
+  } > RAM
+
+  .data : {
+    _data_start = .;
+    *(.data)
+    *(.sdata)
+    _data_end = .;
+  } > RAM
+
   . = ALIGN(4);
-  _bss_start = .;
-  .bss : {*(.bss)} > RAM
-  _bss_end = .;
-  .rom : { _rom_start = .; } > ROM
-  .ram : { _ram_start = .; } > RAM
+
+  .bss : {
+    _bss_start = .;
+    *(.bss)
+    _bss_end = .;
+  } > RAM
 }

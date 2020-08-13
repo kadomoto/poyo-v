@@ -1,65 +1,26 @@
 #include <poyoio.h>
-#include <poyolib.h>
-#include <xmodem.h>
-
-
-static int dump(char *buf, long size) {
-    long i;
-
-    if (size < 0) {
-        puts("no data.\n");
-        return -1;
-    }
-    for (i = 0; i < size; i++) {
-        putxval(buf[i], 2);
-        if ((i & 0xf) == 15) {
-            puts("\n");
-        } else {
-            if ((i & 0xf) == 7) puts(" ");
-            puts(" ");
-        }
-    }
-    puts("\n");
-
-    return 0;
-}
 
 
 int main() {
-    static char buf[16];
-    static long size = -1;
-    static unsigned char *loadbuf = ((void *)0);
-    extern int _ram_start;
 
-    while (1) {
-        puts("root# ");
-        gets(buf);
+    while(1){
 
-        if (!strcmp(buf, "load")) {
-            loadbuf = (char *)(&_ram_start);
-            size = xmodem_recv(loadbuf);
-            if (size < 0) {
-	            puts("\nXMODEM transfer error!\n");
-            } else {
-	            puts("\nXMODEM transfer complete\n");
-            }
-        } else if (!strcmp(buf, "dump")) {
-            puts("size: ");
-            putxval(size, 0);
-            puts("\n");
-            dump(loadbuf, size);
-        } else if (!strcmp(buf, "screenfetch")) {
-            puts(" ######    #####   ##  ##    #####\n");
-            puts("  ##  ##  ##   ##  ##  ##   ##   ##\n");
-            puts("  ##  ##  ##   ##  ##  ##   ##   ##\n");
-            puts("  #####   ##   ##   ####    ##   ##\n");
-            puts("  ##      ##   ##    ##     ##   ##\n");
-            puts("  ##      ##   ##    ##     ##   ##\n");
-            puts(" ####      #####    ####     #####\n");
-        } else {
-            puts("unknown.\n");
+        serial_write('H');
+        serial_write('E');
+
+        for (int i=0; i < 2; i++) {
+        	serial_write('L');
         }
+
+        serial_write('O');
+
+        serial_write('C');
+        serial_write('Q');
+
+        delay(3000);
+
     }
 
     return 0;
+
 }
