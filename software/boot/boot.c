@@ -64,7 +64,7 @@ int main() {
         //     dump(loadbuf, size);
         } else if (!strcmp(buf, "run")) {
             puts("start\n");
-            f = (void (*f)(void))entry_point;
+            f = (void (*)(void))entry_point;
             f();
         } else if (!strcmp(buf, "screenfetch")) {
             puts(" ######    #####   ##  ##    #####\n");
