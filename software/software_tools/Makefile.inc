@@ -59,6 +59,7 @@ LIBGCC = \
 # スタートアップルーチンとリンカスクリプトの指定
 CRTASM = $(TOOLS_ROOT)/crt0.s
 CRTOBJ = $(TEST_CODE_ROOT)/crt0.o
+LDSCRIPT_BOOT = $(TOOLS_ROOT)/ld_boot.script
 LDSCRIPT = $(TOOLS_ROOT)/ld.script
 
 $(CRTOBJ): $(CRTASM)
@@ -72,5 +73,7 @@ $(CRTOBJ): $(CRTASM)
 MEM_INIT = $(TOOLS_ROOT)/mem_init.hex
 
 # .hex形式ファイル生成ツールの指定
+HEX_CONVERTER_BOOT = \
+	python3 $(TOOLS_ROOT)/hex_converter_boot.py
 HEX_CONVERTER = \
 	python3 $(TOOLS_ROOT)/hex_converter.py
