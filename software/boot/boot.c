@@ -39,8 +39,9 @@ static int dump(char *buf, long size) {
 int main() {
     static char buf[16];
     static long size = -1;
-    static unsigned char *loadbuf = ((void *)0);
-    extern int _ram_start;
+    static unsigned char *entry_point = ((void *)0);
+    extern int _rom_start;
+    void (*f)(void);
 
     init();
 
@@ -49,18 +50,22 @@ int main() {
         gets(buf);
 
         if (!strcmp(buf, "load")) {
-            loadbuf = (char *)(&_ram_start);
-            size = xmodem_recv(loadbuf);
+            entry_point = (char *)(&_rom_start);
+            size = xmodem_recv(entry_point);
             if (size < 0) {
 	            puts("\nXMODEM transfer error!\n");
             } else {
 	            puts("\nXMODEM transfer complete\n");
             }
-        } else if (!strcmp(buf, "dump")) {
-            puts("size: ");
-            putxval(size, 0);
-            puts("\n");
-            dump(loadbuf, size);
+        // } else if (!strcmp(buf, "dump")) {
+        //     puts("size: ");
+        //     putxval(size, 0);
+        //     puts("\n");
+        //     dump(loadbuf, size);
+        } else if (!strcmp(buf, "run")) {
+            puts("start\n");
+            f = (void (*f)(void))entry_point;
+            f();
         } else if (!strcmp(buf, "screenfetch")) {
             puts(" ######    #####   ##  ##    #####\n");
             puts("  ##  ##  ##   ##  ##  ##   ##   ##\n");
