@@ -13,21 +13,13 @@ module dmem #(parameter byte_num = 2'b00) (
     output wire [7:0] rd_data
 );
 
-    reg [7:0] mem [0:16383];  // 64KiB(16bitアドレス空間)
-    reg [13:0] addr_sync;  // 64KiBを表現するための14bitアドレス(下位2bitはここでは考慮しない)
-    
-    // initial begin
-    //     case (byte_num)
-    //         2'b00: $readmemh({`MEM_DATA_PATH, "data0.hex"}, mem);
-    //         2'b01: $readmemh({`MEM_DATA_PATH, "data1.hex"}, mem);
-    //         2'b10: $readmemh({`MEM_DATA_PATH, "data2.hex"}, mem);
-    //         2'b11: $readmemh({`MEM_DATA_PATH, "data3.hex"}, mem);
-    //     endcase
-    // end      
+    // 2KiB
+    reg [7:0] mem [0:511];  // 2KiB(11bitアドレス空間)
+    reg [8:0] addr_sync;  // 2KiBを表現するための11bitアドレス(下位2bitはここでは考慮しない)     
    
     always @(posedge clk) begin
-        if (we) mem[addr[15:2]] <= wr_data;  // 書き込みタイミングをクロックと同期することでBRAM化
-        addr_sync <= addr[15:2];  // 読み出しアドレス更新をクロックと同期することでBRAM化
+        if (we) mem[addr[10:2]] <= wr_data;  // 書き込みタイミングをクロックと同期することでBRAM化
+        addr_sync <= addr[10:2];  // 読み出しアドレス更新をクロックと同期することでBRAM化
     end
 
     assign rd_data = mem[addr_sync];

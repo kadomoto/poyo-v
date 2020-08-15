@@ -25,9 +25,10 @@ module cpu_top (
     reg [31:0] PC;
 
     // fetch stage関連の定義
-    wire imem_we;
+    wire [3:0] imem_we;
     wire [31:0] imem_wr_addr, imem_rd_addr;
-    wire [31:0] imem_wr_data, imem_rd_data;
+    wire [7:0] imem_wr_data [3:0];
+    wire [7:0] imem_rd_data [3:0];
     wire [31:0] rom_rd_addr, rom_rd_data;
 
     // execution stage関連の定義
@@ -111,40 +112,68 @@ module cpu_top (
     //====================================================================
     // fetch stage
     //====================================================================
-
+    
     // ex stageの結果をフォワーディング
     assign rom_rd_addr = (rst_n == 1'b0) ? 32'd0 : ex_br_taken ? ex_br_addr : PC;
-    assign imem_rd_addr = (rst_n == 1'b0) ? 32'd0 : ex_br_taken ? ex_br_addr : PC;
-
+    assign imem_rd_addr = (rst_n == 1'b0) ? 32'd0 : (rom_rd_addr - `IMEM_START_ADDR);
+    
     bootrom bootrom (
         .clk(clk),
         .addr(rom_rd_addr),
         .rd_data(rom_rd_data)
     );
-
-    imem imem (
+    
+    imem #(.byte_num(2'b00)) imem_0 (
         .clk(clk),
-        .we(imem_we),
+        .we(imem_we[0]),
         .wr_addr(imem_wr_addr),
         .rd_addr(imem_rd_addr),
-        .wr_data(imem_wr_data),
-        .rd_data(imem_rd_data)
+        .wr_data(imem_wr_data[0]),
+        .rd_data(imem_rd_data[0])
+    );
+    
+    imem #(.byte_num(2'b01)) imem_1 (
+        .clk(clk),
+        .we(imem_we[1]),
+        .wr_addr(imem_wr_addr),
+        .rd_addr(imem_rd_addr),
+        .wr_data(imem_wr_data[1]),
+        .rd_data(imem_rd_data[1])
+    );
+    
+    imem #(.byte_num(2'b10)) imem_2 (
+        .clk(clk),
+        .we(imem_we[2]),
+        .wr_addr(imem_wr_addr),
+        .rd_addr(imem_rd_addr),
+        .wr_data(imem_wr_data[2]),
+        .rd_data(imem_rd_data[2])
+    );
+    
+    imem #(.byte_num(2'b11)) imem_3 (
+        .clk(clk),
+        .we(imem_we[3]),
+        .wr_addr(imem_wr_addr),
+        .rd_addr(imem_rd_addr),
+        .wr_data(imem_wr_data[3]),
+        .rd_data(imem_rd_data[3])
     );
     
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
             ex_PC <= 32'd0;
         end else begin
-            ex_PC <= imem_rd_addr;
+            ex_PC <= rom_rd_addr;
         end
     end
-
+    
     //====================================================================
     // execution stage
     //====================================================================
-
-    assign decoder_insn = (ex_PC < (`BOOTROM_START_ADDR + `BOOTROM_SIZE)) ? rom_rd_data : imem_rd_data;
-
+    
+    assign decoder_insn = (ex_PC < (`BOOTROM_START_ADDR + `BOOTROM_SIZE)) ?
+                          rom_rd_data : {imem_rd_data[3], imem_rd_data[2], imem_rd_data[1], imem_rd_data[0]};
+    
     decoder decoder_0 (
         .insn(decoder_insn),
         .srcreg1_num(decoder_srcreg1_num),
@@ -158,11 +187,11 @@ module cpu_top (
         .is_load(ex_is_load),
         .is_store(ex_is_store)
     );
-
-
+    
+    
     assign regfile_srcreg1_num = decoder_srcreg1_num;
     assign regfile_srcreg2_num = decoder_srcreg2_num;
-
+    
     regfile regfile_0 (
         .clk(clk),
         .we(regfile_we),
@@ -173,24 +202,24 @@ module cpu_top (
         .srcreg1_value(regfile_srcreg1_value),
         .srcreg2_value(regfile_srcreg2_value)
     );
-
-
+    
+    
     // alu
     assign alu_alucode = ex_alucode;
-
+    
     // wb stageの結果をフォワーディング
-    assign ex_srcreg1_value = (regfile_srcreg1_num==5'd0) ? 32'd0 : 
+    assign ex_srcreg1_value = (regfile_srcreg1_num == 5'd0) ? 32'd0 : 
                               (wb_reg_we && (decoder_srcreg1_num == wb_dstreg_num)) ? wb_dstreg_value : regfile_srcreg1_value;
-    assign ex_srcreg2_value = (regfile_srcreg2_num==5'd0) ? 32'd0 : 
+    assign ex_srcreg2_value = (regfile_srcreg2_num == 5'd0) ? 32'd0 : 
                               (wb_reg_we && (decoder_srcreg2_num == wb_dstreg_num)) ? wb_dstreg_value : regfile_srcreg2_value;
-
+    
     assign alu_op1 = (ex_aluop1_type == `OP_TYPE_REG) ? ex_srcreg1_value :
                      (ex_aluop1_type == `OP_TYPE_IMM) ? decoder_imm :
                      (ex_aluop1_type == `OP_TYPE_PC) ? ex_PC: 32'd0;
     assign alu_op2 = (ex_aluop2_type == `OP_TYPE_REG) ? ex_srcreg2_value :
                      (ex_aluop2_type == `OP_TYPE_IMM) ? decoder_imm :
                      (ex_aluop2_type == `OP_TYPE_PC) ? ex_PC : 32'd0;
-
+    
     alu alu_0 (
         .alucode(alu_alucode),
         .op1(alu_op1),
@@ -198,20 +227,20 @@ module cpu_top (
         .alu_result(ex_alu_result),
         .br_taken(ex_br_taken)
     );
-
+    
     assign ex_store_value = ((ex_alucode == `ALU_SW) || (ex_alucode == `ALU_SH) || (ex_alucode == `ALU_SB)) ? ex_srcreg2_value : 32'd0;
-
+    
     assign ex_br_addr = (ex_alucode == `ALU_JAL) ? ex_PC + decoder_imm :
                         (ex_alucode == `ALU_JALR) ? alu_op1 + decoder_imm :
                         ((ex_alucode == `ALU_BEQ) || (ex_alucode == `ALU_BNE) || (ex_alucode == `ALU_BLT) ||
                          (ex_alucode == `ALU_BGE) || (ex_alucode == `ALU_BLTU) || (ex_alucode == `ALU_BGEU)) ? ex_PC + decoder_imm : 32'd0;
-
     
+        
     // メモリアクセス
     assign dmem_addr = ex_alu_result - `DMEM_START_ADDR;  // データメモリへの入力アドレスに変換
     assign imem_wr_addr = ex_alu_result - `IMEM_START_ADDR;  // 命令メモリへの入力アドレスに変換
     assign ram_rd_addr = ex_alu_result - `BOOTRAM_START_ADDR;  // ブート用データメモリへの入力アドレスに変換
-
+    
     function [31:0] dmem_wr_data_sel(
         input is_store,
         input [5:0] alucode,
@@ -247,10 +276,14 @@ module cpu_top (
         end
         
     endfunction
-
-    assign {dmem_wr_data[3], dmem_wr_data[2], dmem_wr_data[1], dmem_wr_data[0]} = dmem_wr_data_sel(ex_is_store, ex_alucode, ex_alu_result[1:0], ex_store_value);
-
     
+    // dmemへの書き込みデータ
+    assign {dmem_wr_data[3], dmem_wr_data[2], dmem_wr_data[1], dmem_wr_data[0]} = dmem_wr_data_sel(ex_is_store, ex_alucode, ex_alu_result[1:0], ex_store_value);
+    
+    // imemへの書き込みデータ
+    assign {imem_wr_data[3], imem_wr_data[2], imem_wr_data[1], imem_wr_data[0]} = dmem_wr_data_sel(ex_is_store, ex_alucode, ex_alu_result[1:0], ex_store_value); 
+    
+     
     function [3:0] dmem_we_sel(
         input is_store,
         input [5:0] alucode,
@@ -289,32 +322,17 @@ module cpu_top (
     // メモリマップのデータメモリにあたるアドレスが指定されていれば書き込み有効化
     assign dmem_we = (dmem_addr < `DMEM_SIZE) ? dmem_we_sel(ex_is_store, ex_alucode, ex_alu_result[1:0]) : 4'd0;
 
-
-    function [3:0] imem_we_sel(
-        input is_store,
-        input [5:0] alucode,
-        input [1:0] alu_result
-    );
-        
-        begin
-            if (is_store) begin
-                case (alucode)
-                    `ALU_SW: imem_we_sel = 1'b1;
-                    `ALU_SH: imem_we_sel = 1'b0; 
-                    `ALU_SB: imem_we_sel = 1'b0;                 
-                    default: imem_we_sel = 1'b0;
-                endcase
-            end else begin
-                imem_we_sel = 1'b0;
-            end
-        end
-        
-    endfunction
-
     // メモリマップの命令メモリにあたるアドレスが指定されていれば書き込み有効化
-    assign imem_we = (imem_wr_addr < `IMEM_SIZE) ? imem_we_sel(ex_is_store, ex_alucode, ex_alu_result[1:0]) : 1'd0;
-
-
+    assign imem_we = (imem_wr_addr < `IMEM_SIZE) ? dmem_we_sel(ex_is_store, ex_alucode, ex_alu_result[1:0]) : 4'd0;
+    
+    
+    bootram bootram (
+        .clk(clk),
+        .addr(ram_rd_addr),
+        .rd_data(ram_rd_data)
+    );
+    
+    
     dmem #(.byte_num(2'b00)) dmem_0 (
         .clk(clk),
         .we(dmem_we[0]),
@@ -345,13 +363,6 @@ module cpu_top (
         .addr(dmem_addr),
         .wr_data(dmem_wr_data[3]),
         .rd_data(dmem_rd_data[3])
-    );
-
-
-    bootram bootram (
-        .clk(clk),
-        .addr(ram_rd_addr),
-        .rd_data(ram_rd_data)
     );
     
 
