@@ -11,6 +11,8 @@ module cpu_top (
     input wire uart_rx,
     input wire [3:0] gpi_in,
     output wire [3:0] gpo_out,
+    output wire [7:0] cml_out,
+    output wire [7:0] hys_out,
     output wire uart_tx
 );
 
@@ -81,6 +83,16 @@ module cpu_top (
     wire [7:0] gpo_data_in;
     wire [7:0] gpo_data_out;
     wire [31:0] gpo_value;
+
+    // BIAS
+    wire cml_we;
+    wire [7:0] cml_data_in;
+    wire [7:0] cml_data_out;
+    wire [31:0] cml_value;
+    wire hys_we;
+    wire [7:0] hys_data_in;
+    wire [7:0] hys_data_out;
+    wire [31:0] hys_value;
 
     // ハードウェアカウンタ
     wire [31:0] hc_value;
@@ -412,6 +424,31 @@ module cpu_top (
     );
 
 
+    // BIAS
+    assign cml_data_in = ex_store_value[7:0];
+    assign cml_we = ((ex_alu_result == `CML_ADDR) && ex_is_store) ? `ENABLE : `DISABLE;
+    assign cml_out = cml_data_out;
+    assign hys_data_in = ex_store_value[7:0];
+    assign hys_we = ((ex_alu_result == `HYS_ADDR) && ex_is_store) ? `ENABLE : `DISABLE;    
+    assign hys_out = hys_data_out;
+
+    gpo cml (
+		.clk(clk),
+		.rst_n(rst_n),
+		.we(cml_we),
+		.wr_data(cml_data_in),
+		.gpo_out(cml_data_out)
+    );
+
+    gpo hys (
+		.clk(clk),
+		.rst_n(rst_n),
+		.we(hys_we),
+		.wr_data(hys_data_in),
+		.gpo_out(hys_data_out)
+    );
+
+
     // hardware counter
     hardware_counter hardware_counter_0 (
         .clk(clk),
@@ -456,6 +493,8 @@ module cpu_top (
     assign gpo_value = {28'd0, gpo_data_out[3:0]};
     assign uart_tx_value = {31'd0, uart_busy};
     assign uart_rx_value = {23'd0, uart_rd_en, uart_rd_data};
+    assign cml_value = {24'd0, cml_data_out};
+    assign hys_value = {24'd0, hys_data_out};
     
     function [31:0] load_value_sel(
         input is_load,
@@ -465,7 +504,9 @@ module cpu_top (
         input [31:0] uart_tx_value, uart_rx_value,
         input [31:0] hc_value,
         input [31:0] gpi_value,
-        input [31:0] gpo_value
+        input [31:0] gpo_value,
+        input [31:0] cml_value,
+        input [31:0] hys_value
     );
         
         begin
@@ -482,6 +523,10 @@ module cpu_top (
                             load_value_sel = gpi_value;
                         end else if (alu_result == `GPO_ADDR) begin
                             load_value_sel = gpo_value;
+                        end else if (alu_result == `CML_ADDR) begin
+                            load_value_sel = cml_value;
+                        end else if (alu_result == `HYS_ADDR) begin
+                            load_value_sel = hys_value;
                         end else begin
                             load_value_sel = {dmem_rd_data_3, dmem_rd_data_2, dmem_rd_data_1, dmem_rd_data_0};
                         end
@@ -528,7 +573,7 @@ module cpu_top (
     endfunction
 
     assign wb_load_value = load_value_sel(wb_is_load, wb_alucode, wb_alu_result, mem_rd_data[0],
-                                          mem_rd_data[1], mem_rd_data[2], mem_rd_data[3], uart_tx_value, uart_rx_value, hc_value, gpi_value, gpo_value);
+                                          mem_rd_data[1], mem_rd_data[2], mem_rd_data[3], uart_tx_value, uart_rx_value, hc_value, gpi_value, gpo_value, cml_value, hys_value);
     
     assign wb_dstreg_value = wb_is_load ? wb_load_value : wb_alu_result;
 

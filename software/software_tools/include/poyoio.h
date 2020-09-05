@@ -18,9 +18,17 @@
 #define GPO_WRADDR (unsigned int*)0x20050
 #define GPO_RDADDR (unsigned int*)0x20050
 
+// バイアス関係の設定
+#define CML_ADDR (unsigned int*)0x20060
+#define HYS_ADDR (unsigned int*)0x20070
+
 // poyoio.c
 void digital_write(int pin, int vol);
 int digital_read(int pin);
+void cml_write(int pin, int vol);
+int cml_read(int pin);
+void hys_write(int pin, int vol);
+int hys_read(int pin);
 int serial_write_en();
 void serial_write(unsigned char c);
 int serial_read_en();

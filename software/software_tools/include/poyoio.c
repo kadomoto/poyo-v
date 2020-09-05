@@ -27,6 +27,58 @@ int digital_read(int pin) {
 }
 
 
+void cml_write(int pin, int vol) {
+    volatile unsigned int* output_addr = CML_ADDR;
+    volatile unsigned int* input_addr = CML_ADDR;
+
+    // 0ビット目は0ピンの状態、1ビット目は1ピンの状態というように値を格納しているので、
+    // ピンの値に応じたビットのみを変更する
+    if (vol == 1) {
+        *output_addr = (*input_addr | (1 << pin));
+    } else if (vol == 0) {
+        *output_addr = (*input_addr & ~(1 << pin));
+    }
+}
+
+
+int cml_read(int pin) {
+    volatile unsigned int* input_addr = CML_ADDR;
+    int vol;
+
+    // 0ビット目は0ピンの状態、1ビット目は1ピンの状態というように値を格納しているので、
+    // ピンの値に応じて特定ビットを読み出す
+    vol = (*input_addr >> pin) & 1;
+
+    return vol;
+}
+
+
+void hys_write(int pin, int vol) {
+    volatile unsigned int* output_addr = HYS_ADDR;
+    volatile unsigned int* input_addr = HYS_ADDR;
+
+    // 0ビット目は0ピンの状態、1ビット目は1ピンの状態というように値を格納しているので、
+    // ピンの値に応じたビットのみを変更する
+    if (vol == 1) {
+        *output_addr = (*input_addr | (1 << pin));
+    } else if (vol == 0) {
+        *output_addr = (*input_addr & ~(1 << pin));
+    }
+}
+
+
+int hys_read(int pin) {
+    volatile unsigned int* input_addr = HYS_ADDR;
+    int vol;
+
+    // 0ビット目は0ピンの状態、1ビット目は1ピンの状態というように値を格納しているので、
+    // ピンの値に応じて特定ビットを読み出す
+    vol = (*input_addr >> pin) & 1;
+
+    return vol;
+}
+
+
 int serial_write_en() {
     volatile unsigned int* input_addr = UART_TX_ADDR;
     return (1 - *input_addr);

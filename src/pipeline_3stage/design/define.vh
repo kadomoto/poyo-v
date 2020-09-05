@@ -44,6 +44,10 @@
 `define GPI_ADDR 32'h20040
 `define GPO_ADDR 32'h20050
 
+// address for BIAS
+`define CML_ADDR 32'h20060
+`define HYS_ADDR 32'h20070
+
 `define ENABLE  1'b1
 `define DISABLE 1'b0
 
