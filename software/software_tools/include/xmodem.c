@@ -17,7 +17,8 @@ static int xmodem_wait(void) {
     long cnt = 0;
 
     while (!serial_read_en()) {
-        if (++cnt >= 30000000) {
+        // if (++cnt >= 30000000) {  // for 40 MHz
+        if (++cnt >= 100000) {  // for 100 KHz
             cnt = 0;
             serial_write(XMODEM_NAK);
         }

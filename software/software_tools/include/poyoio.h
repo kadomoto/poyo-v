@@ -5,7 +5,8 @@
 #define HARDWARE_COUNTER_ADDR (unsigned int*)0x20010
 
 // 1msあたりにかかるサイクル数(周波数[Hz]/1000)を指定
-#define HARDWARE_COUNT_FOR_ONE_MSEC 45000
+//#define HARDWARE_COUNT_FOR_ONE_MSEC 45000
+#define HARDWARE_COUNT_FOR_ONE_MSEC 100
 
 // UART関係の設定
 #define UART_TX_ADDR (unsigned int*)0x20020

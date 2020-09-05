@@ -3,13 +3,13 @@
 #include <xmodem.h>
 
 
-static int init(void) {
-    extern int _rodata_end, _data_start, _data_end;
+// static int init(void) {
+//     extern int _rodata_end, _data_start, _data_end;
 
-    memcpy(&_data_start, &_rodata_end, (long)&_data_end - (long)&_data_start);
+//     memcpy(&_data_start, &_rodata_end, (long)&_data_end - (long)&_data_start);
 
-    return 0;
-}
+//     return 0;
+// }
 
 
 int main() {
@@ -19,7 +19,7 @@ int main() {
     extern int _rom_start;
     void (*f)(void);
 
-    init();
+    // init();
 
     while (1) {
         puts("root# ");
