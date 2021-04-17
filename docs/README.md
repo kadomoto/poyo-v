@@ -60,11 +60,11 @@ $ sudo apt install autoconf automake autotools-dev curl libmpc-dev libmpfr-dev l
 $ git clone --recursive https://github.com/riscv/riscv-gnu-toolchain
 ```
 
-クローン作業が完了したら、リポジトリ内へと移動してツールチェーンのビルド作業をおこないます。下記のようなコマンドを打つことでビルドできます。ここで、--prefix=/opt/riscvによってツールチェーンのインストール先を指定し、--with-arch=rv32gcによってRV32Iを含むRV32GC向けのクロスコンパイラを作ることを命じています。--with-abi=ilp32では浮動小数点演算はハードウェア側でサポートしない前提であることを伝えています。インストール先については変更しても問題ありません。ビルド時間は実行環境のコア数に合わせてmakeコマンド時に-jオプションを指定することで短縮できるかもしれません。
+クローン作業が完了したら、リポジトリ内へと移動してツールチェーンのビルド作業をおこないます。下記のようなコマンドを打つことでビルドできます。ここで、--prefix=/opt/riscvによってツールチェーンのインストール先を指定し、--with-arch=rv32gによってRV32Iを含むRV32GC向けのクロスコンパイラを作ることを命じています。--with-abi=ilp32では浮動小数点演算はハードウェア側でサポートしない前提であることを伝えています。インストール先については変更しても問題ありません。ビルド時間は実行環境のコア数に合わせてmakeコマンド時に-jオプションを指定することで短縮できるかもしれません。
 
 ```
 $ cd riscv-gnu-toolchain/
-$ ./configure --prefix=/opt/riscv --with-arch=rv32gc --with-abi=ilp32
+$ ./configure --prefix=/opt/riscv --with-arch=rv32g --with-abi=ilp32
 $ sudo make
 ```
 
