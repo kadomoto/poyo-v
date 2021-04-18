@@ -15,5 +15,5 @@ SECTIONS
   . = ALIGN(4);
   __bss_start = .;
   .bss : {*(.bss)} > RAM
-  __bss_end = . ;
+  __bss_end = .;
 }

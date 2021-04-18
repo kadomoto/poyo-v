@@ -1,22 +1,48 @@
 #
-# Makefile for c code
+# Makefile for Coremark
 #
 
 # 共通初期設定ファイルをインクルード
 include ../software_tools/Makefile.inc
 
-# C言語ソースコードファイルを指定
-SRC = serial_read.c
+# Coremark用の設定
+# 実行回数を指定(0の場合は自動算出)
+ITERATIONS = 0
+# 周波数[Hz]を指定
+CLOCKS_PER_SEC = 45000000
+# 最適化フラグを指定
+FLAGS_STR = "-O3"
 
-SRCS = $(SRC) $(INCLUDE_ROOT)/poyoio.c
+# C言語ソースコードファイルを指定
+SRC = \
+	core_list_join.c \
+	core_main.c \
+	core_matrix.c \
+	core_state.c \
+	core_util.c \
+
+BAREBONES_ROOT = barebones
+BAREBONES_SRC = \
+	$(BAREBONES_ROOT)/core_portme.c \
+	$(BAREBONES_ROOT)/ee_printf.c \
+
+SRCS = $(SRC) $(BAREBONES_SRC)
 OBJS = $(SRCS:.c=.o)
+
+XCFLAGS = \
+	-g \
+	-DITERATIONS=$(ITERATIONS) \
+	-DCLOCKS_PER_SEC=$(CLOCKS_PER_SEC) \
+	-I ./ \
+	-I $(BAREBONES_ROOT) \
+	-DFLAGS_STR=\"$(FLAGS_STR)\" \
 
 
 all: code.hex data.hex data0.hex data1.hex data2.hex data3.hex
 
 # オブジェクトファイル生成
 %.o: %.c Makefile
-	$(CC) $(CFLAGS) -o $@ -c $<
+	$(CC) $(CFLAGS) $(XCFLAGS) -o $@ -c $<
 
 # 下記はアセンブリコードを入力する場合の例
 #%.o: %.s Makefile
