@@ -4,11 +4,8 @@
 
 
 // プログラムが格納されたディレクトリの絶対パスを指定
-// `define MEM_DATA_PATH "D:/Github/poyo-v/software/Coremark_RV32I_45MHz/"
-`define MEM_DATA_PATH "D:/Github/poyo-v/software/coremark/"
-// `define MEM_DATA_PATH "D:/Github/poyo-v/software/coremark_old/"
-// `define MEM_DATA_PATH "D:/Github/poyo-v/software/coremark_exp/"
-// `define MEM_DATA_PATH "D:/Github/poyo-v/software/coremark_92/"
+`define MEM_DATA_PATH "D:/Github/poyo-v/software/Coremark_RV32I_45MHz/"
+// `define MEM_DATA_PATH "D:/Github/poyo-v/software/coremark/"
 
 // システムクロックの周波数とその半分の値を指定
 `define SYSCLK_FREQ 45000000
