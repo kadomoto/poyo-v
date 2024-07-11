@@ -191,9 +191,6 @@ poyo-vにおいては以下のようなメモリマップを想定していま�
 となります。poyo-vのデータメモリ（dmem.v）は実際には4つのインスタンスへと分割されて呼び出されており、それぞれのインスタンスが対応するファイルを読み込んでいます。
 
  
-## Author
-* **Ourfool in Saginomiya** -[homepage](http://www.saginomiya.xyz/)-
-
 ## License
 * This project is released under the MIT License - see the [LICENSE](LICENSE) file for details.
 * This project includes the work that is distributed in the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0.html).
