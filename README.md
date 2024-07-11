@@ -15,7 +15,8 @@ poyo-vはFPGAやASICに使えるRISC-Vソフトプロセッサです。誰でも
 
 *View documentation, FAQ, help, examples, and more at*
 
-### https://ourfool.github.io/poyo-v/
+### [https://github.com/kadomoto/poyo-v/tree/master/docs](https://github.com/kadomoto/poyo-v/tree/master/docs)
+### 
 
 ## License
 * This project is released under the MIT License - see the [LICENSE](LICENSE) file for details.
